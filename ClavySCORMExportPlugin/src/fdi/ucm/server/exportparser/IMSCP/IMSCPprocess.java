@@ -92,7 +92,7 @@ public class IMSCPprocess {
 	protected HashMap<Long,HashSet<CompleteDocuments>> TablaHTMLLink;
 	private HashSet<CompleteDocuments> ProcesadosGeneral;
 	private int contador_IDs;
-	private HashMap<CompleteGrammar, HashSet<CompleteDocuments>> Gram_doc;
+//	private HashMap<CompleteGrammar, HashSet<CompleteDocuments>> Gram_doc;
 	private int nummap;
 
 	public IMSCPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
@@ -138,6 +138,9 @@ public class IMSCPprocess {
 			contadorFiles=0;
 			contador_IDs=0;
 			
+			
+			String IDBase="com.medpix.clavy."+SN+".sequencing.randomtest";
+			
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder builder = factory.newDocumentBuilder();
 	        DOMImplementation implementation = builder.getDOMImplementation();
@@ -149,39 +152,66 @@ public class IMSCPprocess {
 	        Element manifest = document.getDocumentElement();
 	        
 	        {
+			    Attr Atr = document.createAttribute("identifier");
+			    Atr.setValue(IDBase+".20043rd");
+			    manifest.setAttributeNode(Atr);
+			    }
+	        
+	        
+	        {
 		        Attr Atr = document.createAttribute("xmlns");
 		        Atr.setValue("http://www.imsglobal.org/xsd/imscp_v1p1");
 		        manifest.setAttributeNode(Atr);
 		        }
 		        
-		        {
-			    Attr Atr = document.createAttribute("xmlns:imsmd");
-			    Atr.setValue("http://www.imsglobal.org/xsd/imsmd_v1p2");
-			    manifest.setAttributeNode(Atr);
-			    }
-
-		        {
+	        {
 			    Attr Atr = document.createAttribute("xmlns:xsi");
 			    Atr.setValue("http://www.w3.org/2001/XMLSchema-instance");
 			    manifest.setAttributeNode(Atr);
 			    }
+	        
+	        {
+			    Attr Atr = document.createAttribute("xmlns:adlcp");
+			    Atr.setValue("http://www.adlnet.org/xsd/adlcp_v1p3");
+			    manifest.setAttributeNode(Atr);
+			    }
+	        
+	        {
+			    Attr Atr = document.createAttribute("xmlns:adlseq");
+			    Atr.setValue("http://www.adlnet.org/xsd/adlseq_v1p3");
+			    manifest.setAttributeNode(Atr);
+			    }
 		        
+	        
+		        {
+			    Attr Atr = document.createAttribute("xmlns:adlnav");
+			    Atr.setValue("http://www.adlnet.org/xsd/adlnav_v1p3");
+			    manifest.setAttributeNode(Atr);
+			    }
+		        
+		        {
+				    Attr Atr = document.createAttribute("xmlns:imsss");
+				    Atr.setValue("http://www.imsglobal.org/xsd/imsss");
+				    manifest.setAttributeNode(Atr);
+				    }
+
+		       
 		        {
 			    Attr Atr = document.createAttribute("xsi:schemaLocation");
-			    Atr.setValue("http://www.imsglobal.org/xsd/imscp_v1p1 ../xsds/imscp_v1p2.xsd http://www.imsglobal.org/xsd/imsmd_v1p2 http://www.imsglobal.org/xsd/imsmd_v1p2p4.xsd ");
+			    Atr.setValue("http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd "+
+                             "http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd "+
+                             "http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd "+
+                             "http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd "+
+                             "http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd");
 			    manifest.setAttributeNode(Atr);
 			    }
 		        
-		        {
-			    Attr Atr = document.createAttribute("identifier");
-			    Atr.setValue("CLAVY_MAINFEST"+SN);
-			    manifest.setAttributeNode(Atr);
-			    }
+		       
 		        
 		        
 		        {
 				Attr Atr = document.createAttribute("version");
-				Atr.setValue("IMS CP 1.2");
+				Atr.setValue("1");
 				manifest.setAttributeNode(Atr);
 				}
 	        
@@ -281,93 +311,86 @@ public class IMSCPprocess {
 	}
 
 	private String processOrganization(
-			LinkedList<CompleteDocuments> completeDocumentsList, 
-			Document document,ArrayList<CompleteGrammar> GramaticasAProcesar) {
-			
-			String NameBlock="MAIN_TOC"+completeDocumentsList.get(0).getClavilenoid();
-			
-			Element Organization = document.createElement("organization"); 
-			organizations.appendChild(Organization);
-			
-				{
-		        Attr Atr = document.createAttribute("identifier");
-		        Atr.setValue(NameBlock);
-		        Organization.setAttributeNode(Atr);
-		        }
-		        
-		        {
-			    Attr Atr = document.createAttribute("structure");
-			    Atr.setValue("hierarchical");
-			    Organization.setAttributeNode(Atr);
-			    }
-		        
-		     Element Title = document.createElement("title"); 
-		     Organization.appendChild(Title);
-		     Text nodeKeyValue = document.createTextNode(TextoEntrada);
-		     Title.appendChild(nodeKeyValue);
-		     
-		     Element ItemList = document.createElement("item"); 
-		     Organization.appendChild(ItemList);
-		     
-		     Element TitleIL = document.createElement("title"); 
-		     ItemList.appendChild(TitleIL);
+			LinkedList<CompleteDocuments> completeDocumentsList, Document document,
+			ArrayList<CompleteGrammar> GramaticasAProcesar) {
 
-			     Text nodeKeyValueTiL = document.createTextNode("Total List");
-			     TitleIL.appendChild(nodeKeyValueTiL);
-			     
-			     {
-				        Attr Atr = document.createAttribute("identifier");
-				        Atr.setValue("Total List");
-				        ItemList.setAttributeNode(Atr);
-				        }
-				        
-				        {
-				      
-				        String MAINSTR="MAIN_RESOURCE"+(contadorRec);	
-					    Attr Atr = document.createAttribute("identifierref");
-					    Atr.setValue(MAINSTR);
-					    ItemList.setAttributeNode(Atr);
-					    }
-		     
-			     
-			   Gram_doc=new HashMap<CompleteGrammar, HashSet<CompleteDocuments>>();
-		     
-		     while (!completeDocumentsList.isEmpty())
-		     {
-		    	 CompleteDocuments completeDocuments =completeDocumentsList.removeLast();
-		    	 
-		    	 if (!ProcesadosGeneral.contains(completeDocuments))
-		    	{
-		    	 ProcesadosGeneral.add(completeDocuments);
-//		     }
-//		     for (CompleteDocuments completeDocuments : completeDocumentsList) {
-		     
-		     ArrayList<CompleteGrammar> GramaticasAplicadas=new ArrayList<CompleteGrammar>();
-		     
-		     for (CompleteGrammar completeGrammar : GramaticasAProcesar) {
-					if (StaticFunctionsIMSCP.isInGrammar(completeDocuments,completeGrammar))
+		String NameBlock = "MAIN_TOC" + completeDocumentsList.get(0).getClavilenoid();
+
+		Element Organization = document.createElement("organization");
+		organizations.appendChild(Organization);
+
+		{
+			Attr Atr = document.createAttribute("identifier");
+			Atr.setValue(NameBlock);
+			Organization.setAttributeNode(Atr);
+		}
+
+		{
+			Attr Atr = document.createAttribute("adlseq:objectivesGlobalToSystem");
+			Atr.setValue("false");
+			Organization.setAttributeNode(Atr);
+		}
+
+		Element Title = document.createElement("title");
+		Organization.appendChild(Title);
+		Text nodeKeyValue = document.createTextNode(TextoEntrada);
+		Title.appendChild(nodeKeyValue);
+
+		Element ItemList = document.createElement("item");
+		Organization.appendChild(ItemList);
+
+		Element TitleIL = document.createElement("title");
+		ItemList.appendChild(TitleIL);
+
+		Text nodeKeyValueTiL = document.createTextNode("Cases");
+		TitleIL.appendChild(nodeKeyValueTiL);
+
+		{
+			Attr Atr = document.createAttribute("identifier");
+			Atr.setValue("content_wrapper");
+			ItemList.setAttributeNode(Atr);
+		}
+
+		{
+			Attr Atr = document.createAttribute("isvisible");
+			Atr.setValue("false");
+			ItemList.setAttributeNode(Atr);
+		}
+
+//		Gram_doc = new HashMap<CompleteGrammar, HashSet<CompleteDocuments>>();
+
+		while (!completeDocumentsList.isEmpty()) {
+			CompleteDocuments completeDocuments = completeDocumentsList.removeLast();
+
+			if (!ProcesadosGeneral.contains(completeDocuments)) {
+				ProcesadosGeneral.add(completeDocuments);
+				// }
+				// for (CompleteDocuments completeDocuments :
+				// completeDocumentsList) {
+
+				ArrayList<CompleteGrammar> GramaticasAplicadas = new ArrayList<CompleteGrammar>();
+
+				for (CompleteGrammar completeGrammar : GramaticasAProcesar) {
+					if (StaticFunctionsIMSCP.isInGrammar(completeDocuments, completeGrammar))
 						GramaticasAplicadas.add(completeGrammar);
-				
-				
+
 				}
-		    
 		     
-		     for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
-		    	 
-		    	 
-		    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
-		    	 
-		    	 if (DocGram==null)
-		    		 DocGram=new HashSet<CompleteDocuments>();
-		    	 
-		    	 DocGram.add(completeDocuments);
-		    	 
-		    	 Gram_doc.put(completeGrammar, DocGram);
-		    	 
-		     } 
+//				for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
+//			    	 
+//			    	 
+//			    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
+//			    	 
+//			    	 if (DocGram==null)
+//			    		 DocGram=new HashSet<CompleteDocuments>();
+//			    	 
+//			    	 DocGram.add(completeDocuments);
+//			    	 
+//			    	 Gram_doc.put(completeGrammar, DocGram);
+//			    	 
+//			     } 
 		     
-		     
-		     String Grammarname="ungrammar";
+		     String Grammarname="ID";
 	    	 if (GramaticasAplicadas.size()>0)
 	    		 Grammarname=GramaticasAplicadas.get(0).getNombre();
 		     
@@ -384,7 +407,7 @@ public class IMSCPprocess {
 			     
 			     {
 				        Attr Atr = document.createAttribute("identifier");
-				        Atr.setValue(Grammarname+": "+completeDocuments.getClavilenoid()+"_"+contador_IDs++);
+				        Atr.setValue(Grammarname+"_"+completeDocuments.getClavilenoid()+"_"+contador_IDs++);
 				        Item.setAttributeNode(Atr);
 				        }
 				        
@@ -408,6 +431,25 @@ public class IMSCPprocess {
 					     Text nodeKeyValueTi = document.createTextNode(CuterTiyle);
 					     TitleI.appendChild(nodeKeyValueTi);
 					     
+					     Element imssssequencing = document.createElement("imsss:sequencing"); 
+					        Item.appendChild(imssssequencing);
+					        
+					        Element imsssdeliveryControls = document.createElement("imsss:deliveryControls"); 
+					        imssssequencing.appendChild(imsssdeliveryControls);
+					     
+					        {
+						        Attr Atr = document.createAttribute("completionSetByContent");
+						        Atr.setValue("true");
+						        imsssdeliveryControls.setAttributeNode(Atr);
+						        }
+					        
+					        {
+						        Attr Atr = document.createAttribute("objectiveSetByContent");
+						        Atr.setValue("true");
+						        imsssdeliveryControls.setAttributeNode(Atr);
+						        }
+					        
+					        
 					     
 					     for (CompleteDocuments completedocHijo : ListaLinkeados) {
 								if (!Procesados.contains(completedocHijo))
@@ -439,121 +481,50 @@ public class IMSCPprocess {
 		     
 		     }
 		     
-		     //SOLO SI HAY MAS DE UNA GRAMTICA
-		     if (Gram_doc.keySet().size()>1)
-		     for (Entry<CompleteGrammar, HashSet<CompleteDocuments>> grupillo : Gram_doc.entrySet()) {
-		    	 Element ItemListG = document.createElement("item"); 
-			     Organization.appendChild(ItemListG);
-			     
-			     Element TitleILG = document.createElement("title"); 
-			     ItemListG.appendChild(TitleILG);
-
-				     Text nodeKeyValueTiLG = document.createTextNode("List of: "+grupillo.getKey().getNombre());
-				     TitleILG.appendChild(nodeKeyValueTiLG);
-				     
-				     
-				     {
-					        Attr Atr = document.createAttribute("identifier");
-					        Atr.setValue("List of: "+grupillo.getKey().getNombre()+(contador_IDs++));
-					        ItemListG.setAttributeNode(Atr);
-					        }
-					        
-					        {
-					      
-					        String MAINSTR="MAIN_RESOURCE"+(contadorRec);	
-						    Attr Atr = document.createAttribute("identifierref");
-						    Atr.setValue(MAINSTR);
-						    ItemListG.setAttributeNode(Atr);
-						    }
-
-				    	
-//				     }
-				     for (CompleteDocuments completeDocuments : grupillo.getValue()) {
-				     
-				    	 
-				    	 
-//				    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
-//				    	 
-//				    	 if (DocGram==null)
-//				    		 DocGram=new HashSet<CompleteDocuments>();
-//				    	 
-//				    	 DocGram.add(completeDocuments);
-//				    	 
-//				    	 Gram_doc.put(completeGrammar, DocGram);
-				    	 
-				    	 
-				    	 
-				    	 HashSet<CompleteDocuments> ListaLinkeados=new HashSet<CompleteDocuments>();
-				    	 HashSet<CompleteDocuments> Procesados = new HashSet<CompleteDocuments>();
-				    	 Procesados.add(completeDocuments);
-				    	 
-				    	 
-					     
-				    	 
-				    	 Element Item = document.createElement("item"); 
-				    	 ItemListG.appendChild(Item);
-					     
-					     {
-						        Attr Atr = document.createAttribute("identifier");
-						        Atr.setValue(grupillo.getKey().getNombre()+"_"+grupillo.getKey().getNombre()+": "+completeDocuments.getClavilenoid()+"_"+contador_IDs++);
-						        Item.setAttributeNode(Atr);
-						        }
-						        
-						        {
-						      
-						        String MAINSTR="MAIN_RESOURCE"+(contadorRec++);	
-						        List<CompleteGrammar> lista=new ArrayList<>();
-						        lista.add(grupillo.getKey());
-						        String Recurso=ProcessFileHTML(completeDocuments,lista,ListaLinkeados);
-							    Attr Atr = document.createAttribute("identifierref");
-							    Atr.setValue(MAINSTR);
-							    Item.setAttributeNode(Atr);
-							    Recursos.put(MAINSTR, Recurso);
-							    }
-						        
-						        Element TitleI = document.createElement("title"); 
-						        Item.appendChild(TitleI);
-						        
-						        String CuterTiyle=grupillo.getKey().getNombre()+": "+completeDocuments.getDescriptionText();
-						        if (CuterTiyle.length()>55)
-						        	CuterTiyle=CuterTiyle.substring(0, 50)+"...";
-						        
-							     Text nodeKeyValueTi = document.createTextNode(CuterTiyle);
-							     TitleI.appendChild(nodeKeyValueTi);
-							     
-							     
-							     for (CompleteDocuments completedocHijo : ListaLinkeados) {
-										if (!Procesados.contains(completedocHijo))
-										{
-											Procesados.add(completedocHijo);
-											ArrayList<CompleteGrammar> GramaticasAProcesarHijo=ProcesaGramaticas(Salvar.getMetamodelGrammar());
-											ArrayList<CompleteGrammar> completeGrammarLHijo=new ArrayList<CompleteGrammar>();
-											
-
-											
-											
-											for (CompleteGrammar completeGrammar2 : GramaticasAProcesarHijo) {
-												if (StaticFunctionsIMSCP.isInGrammar(completedocHijo,completeGrammar2))
-													completeGrammarLHijo.add(completeGrammar2);
-											
-											
-											}
-											
-											
-											processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
-											
-										}
-
-							     
-							     
-					}
-				     
-				     }
-				     
-			}
+		Element imssssequencing = document.createElement("imsss:sequencing"); 
+   	 ItemList.appendChild(imssssequencing);
 		     
-		     
+   	Element imssscontrolMode = document.createElement("imsss:controlMode"); 
+   	imssssequencing.appendChild(imssscontrolMode);
 		
+   	{
+		Attr Atr = document.createAttribute("choice");
+		Atr.setValue("true");
+		imssssequencing.setAttributeNode(Atr);
+	}
+
+	{
+		Attr Atr = document.createAttribute("flow");
+		Atr.setValue("true");
+		imssssequencing.setAttributeNode(Atr);
+	}
+   	
+	
+	
+	/*
+	 * <imsss:rollupRules objectiveMeasureWeight="0" rollupObjectiveSatisfied="false" rollupProgressCompletion="false">
+
+						<imsss:rollupRule childActivitySet="all">
+							<imsss:rollupConditions>
+								<imsss:rollupCondition condition="completed"/>
+							</imsss:rollupConditions>
+							<imsss:rollupAction action="satisfied"/>
+						</imsss:rollupRule>
+					</imsss:rollupRules>
+
+					<!-- Write this objective's satisfaction status to a global that we can use as a prerequisite for accessing the post test.-->
+					<imsss:objectives>
+						<imsss:primaryObjective objectiveID="content_completed">
+							<imsss:mapInfo targetObjectiveID="com.medpix.clavy.1234567.sequencing.randomtest.content_completed" writeSatisfiedStatus="true"/>
+						</imsss:primaryObjective>
+					</imsss:objectives>
+
+				</imsss:sequencing>
+	 */
+	
+	//SALIMOS DE WRAPOER Y EMPEZAMOS CON EL POSTTEST
+	
+	
 		return NameBlock;
 	}
 
@@ -571,18 +542,18 @@ public class IMSCPprocess {
 	    	 
 	    	 
 	    	 
-	    	 for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
-	    	 
-	    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
-	    	 
-	    	 if (DocGram==null)
-	    		 DocGram=new HashSet<CompleteDocuments>();
-	    	 
-	    	 DocGram.add(completeDocuments);
-	    	 
-	    	 Gram_doc.put(completeGrammar, DocGram);
-	    	 
-	    	 }
+//	    	 for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
+//	    	 
+//	    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
+//	    	 
+//	    	 if (DocGram==null)
+//	    		 DocGram=new HashSet<CompleteDocuments>();
+//	    	 
+//	    	 DocGram.add(completeDocuments);
+//	    	 
+//	    	 Gram_doc.put(completeGrammar, DocGram);
+//	    	 
+//	    	 }
 	    	 
 	    	 String Grammarname="ungrammar";
 	    	 if (GramaticasAplicadas.size()>0)
@@ -988,40 +959,40 @@ public class IMSCPprocess {
 	private void processMetadata(Document document) {
 		{
 			Element keyNode = document.createElement("schema"); 
-            Text nodeKeyValue = document.createTextNode("IMS Content");	
+            Text nodeKeyValue = document.createTextNode("ADL SCORM");	
             keyNode.appendChild(nodeKeyValue);
             metadata.appendChild(keyNode);
 		}
 		
 		{
 			Element keyNode = document.createElement("schemaversion"); 
-            Text nodeKeyValue = document.createTextNode("1.2");	
+            Text nodeKeyValue = document.createTextNode("2004 3rd Edition");	
             keyNode.appendChild(nodeKeyValue);
             metadata.appendChild(keyNode);
 		}
 		
 		
-		//IMS LOM
-		{
-			Element LOM = document.createElement("imsmd:lom"); 
-            metadata.appendChild(LOM);
-            
-            Element General = document.createElement("imsmd:general"); 
-            LOM.appendChild(General);
-            
-            Element Title = document.createElement("imsmd:title"); 
-            General.appendChild(Title);
-            
-            Element Lan = document.createElement("imsmd:langstring"); 
-            Title.appendChild(Lan);
-            
-            Attr Atr = document.createAttribute("xml:lang");
-			Atr.setValue("en-US");
-			Lan.setAttributeNode(Atr);
-			
-			Text nodeKeyValue = document.createTextNode(TextoEntrada);
-			Lan.appendChild(nodeKeyValue);
-		}
+//		//IMS LOM
+//		{
+//			Element LOM = document.createElement("imsmd:lom"); 
+//            metadata.appendChild(LOM);
+//            
+//            Element General = document.createElement("imsmd:general"); 
+//            LOM.appendChild(General);
+//            
+//            Element Title = document.createElement("imsmd:title"); 
+//            General.appendChild(Title);
+//            
+//            Element Lan = document.createElement("imsmd:langstring"); 
+//            Title.appendChild(Lan);
+//            
+//            Attr Atr = document.createAttribute("xml:lang");
+//			Atr.setValue("en-US");
+//			Lan.setAttributeNode(Atr);
+//			
+//			Text nodeKeyValue = document.createTextNode(TextoEntrada);
+//			Lan.appendChild(nodeKeyValue);
+//		}
 		
 		
 		
@@ -1629,11 +1600,7 @@ return null;
 
 	protected ArrayList<CompleteGrammar> ProcesaGramaticas(
 			List<CompleteGrammar> metamodelGrammar) {
-		ArrayList<CompleteGrammar> Salida=new ArrayList<CompleteGrammar>();
-		for (CompleteGrammar completeGrammar : metamodelGrammar) {
-			Salida.add(completeGrammar);
-		}
-		return Salida;
+		return new ArrayList<CompleteGrammar>(metamodelGrammar);
 	}
 	
 	public static boolean testLink(String baseURLOda2) {

@@ -28,7 +28,7 @@ import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
  */
 public class IMSCPSaveCollection extends SaveCollection {
 
-	private static final String IMSCP = "IMS CP";
+	private static final String IMSCP = "SCORM";
 	private ArrayList<ImportExportPair> Parametros;
 	private String Path;
 	private String FileIO;
