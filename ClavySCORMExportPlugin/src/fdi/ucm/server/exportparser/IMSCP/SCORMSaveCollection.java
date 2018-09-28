@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,23 +26,23 @@ import fdi.ucm.server.modelComplete.collection.CompleteLogAndUpdates;
  * @author Joaquin Gayoso-Cabada
  *
  */
-public class IMSCPSaveCollectionMultiple extends SaveCollection {
+public class SCORMSaveCollection extends SaveCollection {
 
-	private static final String IMSCP = "SCORM (Multiple)";
+	private static final String IMSCP = "SCORM";
 	private ArrayList<ImportExportPair> Parametros;
 	private String Path;
 	private String FileIO;
 	private List<String> fileList; 
-	private List<Long> DocumentoRaiz;
+	private Long DocumentoRaiz;
 	private String OUTPUT_ZIP_FILE = "";
 	private String SOURCE_FOLDER = ""; // SourceFolder path
 	private String EntradaText;
-	private static final Pattern regexAmbito = Pattern.compile("^[0-9]+(,[0-9]+)*$");
+	private static final Pattern regexAmbito = Pattern.compile("^[0-9]+$");
 	
 	/**
 	 * Constructor por defecto
 	 */
-		public IMSCPSaveCollectionMultiple() {
+		public SCORMSaveCollection() {
 	}
 
 	/* (non-Javadoc)
@@ -64,9 +63,11 @@ public class IMSCPSaveCollectionMultiple extends SaveCollection {
 			File Dir=new File(SOURCE_FOLDER);
 			Dir.mkdirs();
 			
-			System.out.println(Arrays.toString(DocumentoRaiz.toArray()));
 			
-			IMSCPprocess baseProcess= new IMSCPprocess(DocumentoRaiz,Salvar,SOURCE_FOLDER,CL,EntradaText);	
+			ArrayList<Long> Entrada = new ArrayList<Long>();
+			Entrada.add(DocumentoRaiz);
+			
+			SCORMPprocess baseProcess= new SCORMPprocess(Entrada,Salvar,SOURCE_FOLDER,CL,EntradaText);	
 			baseProcess.preocess();
 				
 			fileList = new ArrayList<String>();
@@ -123,7 +124,7 @@ public class IMSCPSaveCollectionMultiple extends SaveCollection {
 		{
 			ArrayList<ImportExportPair> ListaCampos=new ArrayList<ImportExportPair>();
 			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Text, "Name for de Learning Lesson",false));
-			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Documents, "List of documents Base for de Learning Lesson (Ctrl multisect)",false));
+			ListaCampos.add(new ImportExportPair(ImportExportDataEnum.Document, "Document Base for de Learning Lesson",false));
 			Parametros=ListaCampos;
 			return ListaCampos;
 		}
@@ -136,35 +137,30 @@ public class IMSCPSaveCollectionMultiple extends SaveCollection {
 		{
 			EntradaText=DateEntrada.get(0).trim();
 			
-			
-			
 			String Entrada=DateEntrada.get(1).trim();
-			
-			System.out.println(Entrada);
 			if (Entrada.endsWith(","))
 				Entrada=Entrada.substring(0, Entrada.length()-1);
 			
 			if (testList(Entrada))
 				DocumentoRaiz=generaListaDocuments(Entrada);
 			else
-				throw new CompleteImportRuntimeException("List of Documents can not be normal, list should be like this \"####,####,####\"");
+				throw new CompleteImportRuntimeException("List of Documents can not be normal, list should be like this \"####\"");
 
 		}
 	}
 		
 
-	private List<Long> generaListaDocuments(String string) {
+	private Long generaListaDocuments(String string) {
 		String[] strings=string.split(",");
-		ArrayList<Long> Salida = new ArrayList<Long>();
 		for (String string2 : strings) {
 			try {
 				Long N=Long.parseLong(string2);
-				Salida.add(N);
+				return N;
 			} catch (Exception e) {
 				// handle exception
 			}
 		}
-		return Salida;
+		return null;
 	}
 
 	@Override

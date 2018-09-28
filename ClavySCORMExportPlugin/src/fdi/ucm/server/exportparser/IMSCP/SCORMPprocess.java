@@ -71,7 +71,7 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
  * @author Joaquin Gayoso-Cabada
  *
  */
-public class IMSCPprocess {
+public class SCORMPprocess {
 
 
 	protected static final String EXPORTTEXT = "Export HTML RESULT";
@@ -95,8 +95,9 @@ public class IMSCPprocess {
 	private int contador_IDs;
 //	private HashMap<CompleteGrammar, HashSet<CompleteDocuments>> Gram_doc;
 	private int nummap;
+private String IDBase;
 
-	public IMSCPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
+	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
 		
 		DocumentoT=listaDeDocumentos;
@@ -140,7 +141,7 @@ public class IMSCPprocess {
 			contador_IDs=0;
 			
 			
-			String IDBase="com.medpix.clavy."+SN+".sequencing.randomtest";
+			IDBase="com.medpix.clavy."+SN+".sequencing.randomtest";
 			
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder builder = factory.newDocumentBuilder();
@@ -372,7 +373,7 @@ public class IMSCPprocess {
 				ArrayList<CompleteGrammar> GramaticasAplicadas = new ArrayList<CompleteGrammar>();
 
 				for (CompleteGrammar completeGrammar : GramaticasAProcesar) {
-					if (StaticFunctionsIMSCP.isInGrammar(completeDocuments, completeGrammar))
+					if (StaticFunctionsSCORM.isInGrammar(completeDocuments, completeGrammar))
 						GramaticasAplicadas.add(completeGrammar);
 
 				}
@@ -463,7 +464,7 @@ public class IMSCPprocess {
 									
 									
 									for (CompleteGrammar completeGrammar2 : GramaticasAProcesarHijo) {
-										if (StaticFunctionsIMSCP.isInGrammar(completedocHijo,completeGrammar2))
+										if (StaticFunctionsSCORM.isInGrammar(completedocHijo,completeGrammar2))
 											completeGrammarLHijo.add(completeGrammar2);
 									
 									
@@ -491,36 +492,122 @@ public class IMSCPprocess {
    	{
 		Attr Atr = document.createAttribute("choice");
 		Atr.setValue("true");
-		imssssequencing.setAttributeNode(Atr);
+		imssscontrolMode.setAttributeNode(Atr);
 	}
 
 	{
 		Attr Atr = document.createAttribute("flow");
 		Atr.setValue("true");
-		imssssequencing.setAttributeNode(Atr);
+		imssscontrolMode.setAttributeNode(Atr);
 	}
    	
+	Element imsssrollupRules = document.createElement("imsss:rollupRules"); 
+   	imssssequencing.appendChild(imsssrollupRules);
+		
+   	{
+		Attr Atr = document.createAttribute("objectiveMeasureWeight");
+		Atr.setValue("0");
+		imsssrollupRules.setAttributeNode(Atr);
+	}
+
+	{
+		Attr Atr = document.createAttribute("rollupObjectiveSatisfied");
+		Atr.setValue("false");
+		imsssrollupRules.setAttributeNode(Atr);
+	}
+	
+	{
+		Attr Atr = document.createAttribute("rollupProgressCompletion");
+		Atr.setValue("false");
+		imsssrollupRules.setAttributeNode(Atr);
+	}
+	
+	Element imsssrollupRule = document.createElement("imsss:rollupRule"); 
+	imsssrollupRules.appendChild(imsssrollupRule);
+	{
+		Attr Atr = document.createAttribute("childActivitySet");
+		Atr.setValue("all");
+		imsssrollupRules.setAttributeNode(Atr);
+	}
+	
+	Element imsssrollupConditions = document.createElement("imsss:rollupConditions"); 
+	imsssrollupRule.appendChild(imsssrollupConditions);
+	
+	Element imsssrollupCondition = document.createElement("imsss:rollupCondition"); 
+	imsssrollupConditions.appendChild(imsssrollupCondition);
+	
+	{
+		Attr Atr = document.createAttribute("condition");
+		Atr.setValue("completed");
+		imsssrollupCondition.setAttributeNode(Atr);
+	}
+	
+	Element imsssrollupAction = document.createElement("imsss:rollupAction"); 
+	imsssrollupRule.appendChild(imsssrollupAction);
+	
+	{
+		Attr Atr = document.createAttribute("action");
+		Atr.setValue("satisfied");
+		imsssrollupAction.setAttributeNode(Atr);
+	}
 	
 	
+	Element imsssobjectives = document.createElement("imsss:objectives"); 
+   	imssssequencing.appendChild(imsssobjectives);
+	
+   	Element imsssprimaryObjective = document.createElement("imsss:primaryObjective"); 
+   	imsssobjectives.appendChild(imsssprimaryObjective);
+   	
+   	
+   	{
+		Attr Atr = document.createAttribute("objectiveID");
+		Atr.setValue("content_completed");
+		imsssobjectives.setAttributeNode(Atr);
+	}
+   	
+   	Element imsssmapInfo = document.createElement("imsss:mapInfo"); 
+   	imsssprimaryObjective.appendChild(imsssmapInfo);
+   	{
+		Attr Atr = document.createAttribute("targetObjectiveID");
+		Atr.setValue(IDBase+".content_completed");
+		imsssmapInfo.setAttributeNode(Atr);
+	}
+   	
+   	{
+		Attr Atr = document.createAttribute("writeSatisfiedStatus");
+		Atr.setValue("true");
+		imsssmapInfo.setAttributeNode(Atr);
+	}
+   	
+   	
+   	Element ItemListT = document.createElement("item");
+	Organization.appendChild(ItemListT);
+   	
 	/*
-	 * <imsss:rollupRules objectiveMeasureWeight="0" rollupObjectiveSatisfied="false" rollupProgressCompletion="false">
+	 *<!--The individual tests are hidden so it all just looks like one post test to the learner.-->
+			<item identifier="posttest_item" >
+				<title>Post Test</title>
 
-						<imsss:rollupRule childActivitySet="all">
-							<imsss:rollupConditions>
-								<imsss:rollupCondition condition="completed"/>
-							</imsss:rollupConditions>
-							<imsss:rollupAction action="satisfied"/>
-						</imsss:rollupRule>
-					</imsss:rollupRules>
-
-					<!-- Write this objective's satisfaction status to a global that we can use as a prerequisite for accessing the post test.-->
-					<imsss:objectives>
-						<imsss:primaryObjective objectiveID="content_completed">
-							<imsss:mapInfo targetObjectiveID="com.medpix.clavy.1234567.sequencing.randomtest.content_completed" writeSatisfiedStatus="true"/>
-						</imsss:primaryObjective>
-					</imsss:objectives>
-
-				</imsss:sequencing>
+				<item identifier="test_1" identifierref="assessment_resource" parameters="?content=assessment1" isvisible="false">
+					<title>Test 1</title>
+					<imsss:sequencing IDRef="test_sequencing_rules"></imsss:sequencing>
+					<adlnav:presentation>
+						<adlnav:navigationInterface>
+							<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
+						</adlnav:navigationInterface>
+					</adlnav:presentation>
+				</item>
+				<item identifier="test_2" identifierref="assessment_resource" parameters="?content=assessment2" isvisible="false">
+					<title>Test 2</title>
+					<imsss:sequencing IDRef="test_sequencing_rules"></imsss:sequencing>
+					<adlnav:presentation>
+						<adlnav:navigationInterface>
+							<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
+						</adlnav:navigationInterface>
+					</adlnav:presentation>
+				</item>
+				
+				...
 	 */
 	
 	//SALIMOS DE WRAPOER Y EMPEZAMOS CON EL POSTTEST
@@ -605,7 +692,7 @@ public class IMSCPprocess {
 								
 								
 								for (CompleteGrammar completeGrammar2 : GramaticasAProcesarHijo) {
-									if (StaticFunctionsIMSCP.isInGrammar(completedocHijo,completeGrammar2))
+									if (StaticFunctionsSCORM.isInGrammar(completedocHijo,completeGrammar2))
 										completeGrammarLHijo.add(completeGrammar2);
 								
 								
@@ -711,7 +798,7 @@ public class IMSCPprocess {
 			IconF.mkdirs();
 			
 			
-			String Path=StaticFunctionsIMSCP.calculaIconoString(completeDocuments.getIcon());
+			String Path=StaticFunctionsSCORM.calculaIconoString(completeDocuments.getIcon());
 			
 			String[] spliteStri=Path.split("/");
 			String NameS = spliteStri[spliteStri.length-1];
@@ -779,17 +866,17 @@ public class IMSCPprocess {
 				
 				for (CompleteElementType completeST : completeGrammar.getSons()) {
 					
-					if (StaticFunctionsIMSCP.isVisible(completeST))
+					if (StaticFunctionsSCORM.isVisible(completeST))
 					{
 					
-					if (StaticFunctionsIMSCP.isMap(completeST)&&StaticFunctionsIMSCP.hasValuedChildren(completeST,completeDocuments.getDescription()))	
+					if (StaticFunctionsSCORM.isMap(completeST)&&StaticFunctionsSCORM.hasValuedChildren(completeST,completeDocuments.getDescription()))	
 					{
 						
 						Double Lat;
 						Double Long;
 						
-						Lat=StaticFunctionsIMSCP.getLat(completeST.getSons(),completeDocuments);
-						Long=StaticFunctionsIMSCP.getLong(completeST.getSons(),completeDocuments);
+						Lat=StaticFunctionsSCORM.getLat(completeST.getSons(),completeDocuments);
+						Long=StaticFunctionsSCORM.getLong(completeST.getSons(),completeDocuments);
 						
 						if (Lat!=null&&Long!=null)
 						
@@ -811,7 +898,7 @@ public class IMSCPprocess {
 						StructBufH.append("	<div id=\""+mapOrderString+"\" class=\"hijomap\">");
 						
 						for (CompleteElementType CETY : completeST.getSons()) {
-							if (!StaticFunctionsIMSCP.isLatitude(CETY)&&!StaticFunctionsIMSCP.isLongitude(CETY))
+							if (!StaticFunctionsSCORM.isLatitude(CETY)&&!StaticFunctionsSCORM.isLongitude(CETY))
 							{
 								String Salida = processST(CETY,completeDocuments,listaLinkeados);
 								if (!Salida.isEmpty())
@@ -1161,7 +1248,7 @@ public class IMSCPprocess {
 	private String processST(CompleteElementType completeST,
 			CompleteDocuments completeDocuments, HashSet<CompleteDocuments> listaLinkeados) {
 		
-		if (!StaticFunctionsIMSCP.isVisible(completeST))
+		if (!StaticFunctionsSCORM.isVisible(completeST))
 			return "";
 		
 		StringBuffer StringSalida=new StringBuffer();
@@ -1204,7 +1291,7 @@ public class IMSCPprocess {
 					if (Linked!=null)
 					{
 						
-					String Path=StaticFunctionsIMSCP.calculaIconoString(Linked.getIcon());
+					String Path=StaticFunctionsSCORM.calculaIconoString(Linked.getIcon());
 					
 					
 					String[] spliteStri=Path.split("/");
@@ -1258,9 +1345,9 @@ public class IMSCPprocess {
 					String Link = ((CompleteResourceElementURL)E).getValue();
 							
 					
-					if (StaticFunctionsIMSCP.isimage(Link.toLowerCase()))
+					if (StaticFunctionsSCORM.isimage(Link.toLowerCase()))
 					{
-						String Path=StaticFunctionsIMSCP.calculaIconoString(Link);
+						String Path=StaticFunctionsSCORM.calculaIconoString(Link);
 						
 						
 						String[] spliteStri=Path.split("/");
@@ -1341,7 +1428,7 @@ public class IMSCPprocess {
 					File IconF=new File(SOURCE_FOLDER+File.separator+completeDocuments.getClavilenoid());
 					IconF.mkdirs();
 					
-					String Path=StaticFunctionsIMSCP.calculaIconoString(Linked.getPath());
+					String Path=StaticFunctionsSCORM.calculaIconoString(Linked.getPath());
 					
 					
 					String[] spliteStri=Path.split("/");
@@ -1426,18 +1513,18 @@ public class IMSCPprocess {
 			StringBuffer Hijos=new StringBuffer();
 			for (CompleteElementType hijo : completeST.getSons()) {
 				
-				if (StaticFunctionsIMSCP.isVisible(hijo))
+				if (StaticFunctionsSCORM.isVisible(hijo))
 				{
 				
 					
-					if (StaticFunctionsIMSCP.isMap(hijo)&&StaticFunctionsIMSCP.hasValuedChildren(hijo,completeDocuments.getDescription()))	
+					if (StaticFunctionsSCORM.isMap(hijo)&&StaticFunctionsSCORM.hasValuedChildren(hijo,completeDocuments.getDescription()))	
 					{
 						
 						Double Lat;
 						Double Long;
 						
-						Lat=StaticFunctionsIMSCP.getLat(hijo.getSons(),completeDocuments);
-						Long=StaticFunctionsIMSCP.getLong(hijo.getSons(),completeDocuments);
+						Lat=StaticFunctionsSCORM.getLat(hijo.getSons(),completeDocuments);
+						Long=StaticFunctionsSCORM.getLong(hijo.getSons(),completeDocuments);
 						
 						if (Lat!=null&&Long!=null)
 						
@@ -1459,7 +1546,7 @@ public class IMSCPprocess {
 						StructBufH.append("	<div class=\"hijomap\">");
 						
 						for (CompleteElementType CETY : hijo.getSons()) {
-							if (!StaticFunctionsIMSCP.isLatitude(CETY)&&!StaticFunctionsIMSCP.isLongitude(CETY))
+							if (!StaticFunctionsSCORM.isLatitude(CETY)&&!StaticFunctionsSCORM.isLongitude(CETY))
 							{
 								String Salida = processST(CETY,completeDocuments,listaLinkeados);
 								if (!Salida.isEmpty())

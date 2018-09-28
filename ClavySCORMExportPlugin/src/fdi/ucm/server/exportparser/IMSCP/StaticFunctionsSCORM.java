@@ -12,7 +12,7 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueT
 
 
 
-public class StaticFunctionsIMSCP {
+public class StaticFunctionsSCORM {
 
 	private static final String CLAVYICONOS = "http://a-note.fdi.ucm.es/Clavy/";
 
