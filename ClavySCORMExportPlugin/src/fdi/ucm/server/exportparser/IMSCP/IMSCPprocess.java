@@ -62,6 +62,7 @@ import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteLinkElementType;
+import fdi.ucm.server.modelComplete.collection.grammar.CompleteOperationalValueType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteResourceElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
 
@@ -1600,9 +1601,29 @@ return null;
 
 	protected ArrayList<CompleteGrammar> ProcesaGramaticas(
 			List<CompleteGrammar> metamodelGrammar) {
-		return new ArrayList<CompleteGrammar>(metamodelGrammar);
+		ArrayList<CompleteGrammar> Salida = new ArrayList<CompleteGrammar>();
+		for (CompleteGrammar completeGrammar : metamodelGrammar) {
+			if (!IsIgnore(completeGrammar.getViews()))
+				Salida.add(completeGrammar);
+		}
+		
+		return Salida;
 	}
 	
+	private boolean IsIgnore(ArrayList<CompleteOperationalValueType> views) {
+		for (CompleteOperationalValueType completeOperationalValueType : views) {
+			if (completeOperationalValueType.getView().equals("SCORM")&&completeOperationalValueType.getName().equals("ignore"))
+				try {
+					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
 	public static boolean testLink(String baseURLOda2) {
 		if (baseURLOda2==null||baseURLOda2.isEmpty())
 			return true;
