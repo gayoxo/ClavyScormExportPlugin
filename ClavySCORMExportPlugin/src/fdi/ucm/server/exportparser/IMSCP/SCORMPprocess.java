@@ -98,6 +98,7 @@ public class SCORMPprocess {
 //	private HashMap<CompleteGrammar, HashSet<CompleteDocuments>> Gram_doc;
 	private int nummap;
 private String IDBase;
+private CompleteGrammar Quizz;
 
 	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
@@ -582,9 +583,13 @@ private String IDBase;
 	}
    	
    	
+   	if (Quizz!=null)
+   	{
    	Element ItemListT = document.createElement("item");
 	Organization.appendChild(ItemListT);
-   	
+   	}
+	
+	
 	/*
 	 *<!--The individual tests are hidden so it all just looks like one post test to the learner.-->
 			<item identifier="posttest_item" >
@@ -1694,16 +1699,32 @@ return null;
 		for (CompleteGrammar completeGrammar : metamodelGrammar) {
 			if (!IsIgnore(completeGrammar.getViews()))
 				Salida.add(completeGrammar);
+			if (!IsQuiz(completeGrammar.getViews()))
+				Quizz=completeGrammar;
 		}
 		
 		return Salida;
 	}
 	
+	private boolean IsQuiz(ArrayList<CompleteOperationalValueType> views) {
+		for (CompleteOperationalValueType completeOperationalValueType : views) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Quiz".toLowerCase()))
+				try {
+					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
 	private boolean IsIgnore(ArrayList<CompleteOperationalValueType> views) {
 		for (CompleteOperationalValueType completeOperationalValueType : views) {
-			if (completeOperationalValueType.getView().equals("SCORM")&&completeOperationalValueType.getName().equals("ignore"))
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("ignore".toLowerCase()))
 				try {
-					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault());
+					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault().toLowerCase());
 					return Salida;
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -1758,10 +1779,13 @@ return null;
 		String message="Exception .clavy-> Params Null ";
 		try {
 
-			
-			
-			String fileName = "test.clavy";
-			 System.out.println(fileName);
+			String fileName;
+			if (args.length>0)
+				fileName=args[0];
+			else
+				fileName = "test.clavy";
+			 
+			System.out.println(fileName);
 			 
 
 			 File file = new File(fileName);
@@ -1789,6 +1813,19 @@ return null;
 			 
 		 
 			 List<Long> List = new ArrayList<>();
+			 
+			 //36297
+			 if (args.length>1)
+					 for (int i = 1; i < args.length; i++) {
+						try {
+							List.add(Long.parseLong(args[i]));
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+					}
+
+
+			 
 			SCORMPprocess SP=new SCORMPprocess(List ,object,Folder,new CompleteLogAndUpdates(),"Test");
 			SP.preocess();
 			 
