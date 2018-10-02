@@ -6,10 +6,12 @@ package fdi.ucm.server.exportparser.IMSCP;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -120,7 +122,7 @@ private String IDBase;
 		LinkedList<CompleteDocuments> completeDocuments = new LinkedList<CompleteDocuments>();
 		
 		for (CompleteDocuments docuemntos : Salvar.getEstructuras())
-			if (DocumentoT.contains(docuemntos.getClavilenoid()))
+			if (DocumentoT.isEmpty()||DocumentoT.contains(docuemntos.getClavilenoid()))
 			completeDocuments.addFirst(docuemntos);
 	
 		
@@ -1748,5 +1750,57 @@ return null;
 	    return text.replaceAll("(\\A|\\s)((http|https|ftp|mailto):\\S+)(\\s|\\z)",
 	        "$1<a href=\"$2\">$2</a>$4");
 	}
+	
+	
+	
+	
+	public static void main(String[] args) {
+		String message="Exception .clavy-> Params Null ";
+		try {
+
+			
+			
+			String fileName = "test.clavy";
+			 System.out.println(fileName);
+			 
+
+			 File file = new File(fileName);
+			 FileInputStream fis = new FileInputStream(file);
+			 ObjectInputStream ois = new ObjectInputStream(fis);
+			 CompleteCollection object = (CompleteCollection) ois.readObject();
+			 
+			 
+			 try {
+				 ois.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			
+			 try {
+				 fis.close();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+			 
+			 String Folder = System.getProperty("user.home")+File.separator+System.nanoTime();
+		
+			 new File(Folder).mkdirs();
+			 
+			 
+		 
+			 List<Long> List = new ArrayList<>();
+			SCORMPprocess SP=new SCORMPprocess(List ,object,Folder,new CompleteLogAndUpdates(),"Test");
+			SP.preocess();
+			 
+	    }catch (Exception e) {
+			e.printStackTrace();
+			System.err.println(message);
+			throw new RuntimeException(message);
+		}
+		  
+		  
+	}
+	
+	
 
 }

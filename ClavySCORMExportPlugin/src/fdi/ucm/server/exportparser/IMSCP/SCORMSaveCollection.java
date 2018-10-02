@@ -273,9 +273,7 @@ public class SCORMSaveCollection extends SaveCollection {
 	}
  
 	
-	public static void main(String[] args) {
-		
-	}
+	
 
 
 	private static boolean testList(String number) {
