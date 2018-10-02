@@ -87,10 +87,12 @@ public class SCORMPprocess {
 	private Element organizations;
 	private Element resources;
 	private HashMap<String, String> Recursos;
+	private HashSet<String> RecursosP;
 	private int contadorRec;
 	private String TextoEntrada;
 	private int contadorFiles;
 	protected static final String CLAVY="OdAClavy";
+	private HashMap<CompleteDocuments, String> RecursosQ;
 	protected HashMap<Long,String> TablaHTML;
 	protected HashMap<Long,HashSet<CompleteDocuments>> TablaHTMLLink;
 	private HashSet<CompleteDocuments> ProcesadosGeneral;
@@ -99,6 +101,7 @@ public class SCORMPprocess {
 	private int nummap;
 private String IDBase;
 private CompleteGrammar Quizz;
+private Element imssssequencingCollection;
 
 	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
@@ -136,7 +139,8 @@ private CompleteGrammar Quizz;
 			}
 		
 		Recursos=new HashMap<String,String>();
-		
+		RecursosP= new HashSet<>();
+		RecursosQ=new HashMap<CompleteDocuments, String>();
 		try {
 			
 			contadorRec=0;
@@ -223,10 +227,12 @@ private CompleteGrammar Quizz;
 	        metadata = document.createElement("metadata"); 
 	        organizations = document.createElement("organizations"); 
 	        resources = document.createElement("resources"); 
+	        imssssequencingCollection = document.createElement("imsss:sequencingCollection"); 
 	        
 	        manifest.appendChild(metadata);
 	        manifest.appendChild(organizations);
 	        manifest.appendChild(resources);
+	        manifest.appendChild(imssssequencingCollection);
 	        
 	        processMetadata(document);
 	        String Main_S=processOrganization(completeDocuments,document,GramaticasAProcesar);
@@ -236,7 +242,7 @@ private CompleteGrammar Quizz;
 				organizations.setAttributeNode(Atr);
 			}
 	        processResources(document);
-	        
+	        processSecuancing(document);
 	        
 	        
 	        //Generate XML
@@ -269,6 +275,100 @@ private CompleteGrammar Quizz;
 
 
 	
+	private void processSecuancing(Document document) {
+		Element imssssequencing = document.createElement("imsss:sequencing"); 
+		imssssequencingCollection.appendChild(imssssequencing);
+		{
+	        Attr Atr = document.createAttribute("ID");
+	        Atr.setValue("test_sequencing_rules");
+	        imssssequencing.setAttributeNode(Atr);
+	        }
+		
+		Element imssssequencingRules = document.createElement("imsss:sequencingRules"); 
+		imssssequencing.appendChild(imssssequencingRules);
+		
+		Element imssspostConditionRule = document.createElement("imsss:postConditionRule"); 
+		imssssequencingRules.appendChild(imssspostConditionRule);
+		
+		Element imsssruleConditions = document.createElement("imsss:ruleConditions"); 
+		imssspostConditionRule.appendChild(imsssruleConditions);
+		
+		Element imsssruleCondition = document.createElement("imsss:ruleCondition"); 
+		imsssruleConditions.appendChild(imsssruleCondition);
+		
+		{
+	        Attr Atr = document.createAttribute("condition");
+	        Atr.setValue("always");
+	        imsssruleCondition.setAttributeNode(Atr);
+	        }
+		
+		Element imsssruleAction = document.createElement("imsss:ruleAction"); 
+		imssspostConditionRule.appendChild(imsssruleAction);
+		
+		{
+	        Attr Atr = document.createAttribute("action");
+	        Atr.setValue("exitParent");
+	        imsssruleAction.setAttributeNode(Atr);
+	        }
+		
+		
+		Element imsssobjectives = document.createElement("imsss:objectives"); 
+		imssssequencing.appendChild(imsssobjectives);
+		
+		Element imssprimaryObjective = document.createElement("imsss:primaryObjective"); 
+		imsssobjectives.appendChild(imssprimaryObjective);
+		
+		{
+	        Attr Atr = document.createAttribute("objectiveID");
+	        Atr.setValue("course_score");
+	        imsssobjectives.setAttributeNode(Atr);
+	        }
+		
+		Element imssmapInfo = document.createElement("imsss:mapInfo"); 
+		imssprimaryObjective.appendChild(imssmapInfo);
+		
+		{
+	        Attr Atr = document.createAttribute("targetObjectiveID");
+	        Atr.setValue(IDBase+".course_score");
+	        imssprimaryObjective.setAttributeNode(Atr);
+	        }
+		
+		{
+	        Attr Atr = document.createAttribute("readSatisfiedStatus");
+	        Atr.setValue("false");
+	        imssprimaryObjective.setAttributeNode(Atr);
+	        }
+		
+		{
+	        Attr Atr = document.createAttribute("readNormalizedMeasure");
+	        Atr.setValue("false");
+	        imssprimaryObjective.setAttributeNode(Atr);
+	        }
+		
+		{
+	        Attr Atr = document.createAttribute("writeNormalizedMeasure");
+	        Atr.setValue("true");
+	        imssprimaryObjective.setAttributeNode(Atr);
+	        }
+		
+		
+		Element imssdeliveryControls = document.createElement("imsss:deliveryControls"); 
+		imssssequencing.appendChild(imssdeliveryControls);
+		
+		{
+	        Attr Atr = document.createAttribute("completionSetByContent");
+	        Atr.setValue("true");
+	        imssdeliveryControls.setAttributeNode(Atr);
+	        }
+		
+		{
+	        Attr Atr = document.createAttribute("objectiveSetByContent");
+	        Atr.setValue("true");
+	        imssdeliveryControls.setAttributeNode(Atr);
+	        }
+		
+	}
+
 	private void IncludeJSMAPS() throws IOException {
 		URL website = new URL("https://raw.githubusercontent.com/HPNeo/gmaps/master/gmaps.js");
 		ReadableByteChannel rbc = Channels.newChannel(website.openStream());
@@ -293,7 +393,7 @@ private CompleteGrammar Quizz;
 			    Atr.setValue("webcontent");
 			    ResourceUni.setAttributeNode(Atr);
 			    }
-		        
+		       
 		        
 		        {
 			        Attr Atr = document.createAttribute("href");
@@ -309,9 +409,87 @@ private CompleteGrammar Quizz;
 			        Atr.setValue(recursotable.getValue());
 			        FileUni.setAttributeNode(Atr);
 			        }
+
+		        if (RecursosP.contains(recursotable.getKey()))
+		        {
+		        	 Element dependencyUni = document.createElement("dependency"); 
+				        ResourceUni.appendChild(dependencyUni);
+				        
+				        {
+					        Attr Atr = document.createAttribute("identifierref");
+					        Atr.setValue("common_files");
+					        dependencyUni.setAttributeNode(Atr);
+					        }
+		        }
 		        
-			
 		}
+		
+		Element ResourceUniA = document.createElement("resource"); 
+		resources.appendChild(ResourceUniA);
+		
+		{
+	        Attr Atr = document.createAttribute("identifier");
+	        Atr.setValue("assessment_resource");
+	        ResourceUniA.setAttributeNode(Atr);
+	        }
+	        
+	        {
+		    Attr Atr = document.createAttribute("type");
+		    Atr.setValue("webcontent");
+		    ResourceUniA.setAttributeNode(Atr);
+		    }
+	        
+	    	{
+		        Attr Atr = document.createAttribute("adlcp:scormType");
+		        Atr.setValue("asset");
+		        ResourceUniA.setAttributeNode(Atr);
+		        }
+	    	
+	    	{
+		        Attr Atr = document.createAttribute("href");
+		        Atr.setValue("shared/launchpage.html");
+		        ResourceUniA.setAttributeNode(Atr);
+		        }
+		        
+		
+		
+		
+		Element ResourceUni = document.createElement("resource"); 
+		resources.appendChild(ResourceUni);
+		
+		{
+	        Attr Atr = document.createAttribute("identifier");
+	        Atr.setValue("assessment_resource");
+	        ResourceUni.setAttributeNode(Atr);
+	        }
+	        
+	        {
+		    Attr Atr = document.createAttribute("type");
+		    Atr.setValue("webcontent");
+		    ResourceUni.setAttributeNode(Atr);
+		    }
+	        
+	    	{
+		        Attr Atr = document.createAttribute("adlcp:scormType");
+		        Atr.setValue("asset");
+		        ResourceUni.setAttributeNode(Atr);
+		        }
+	    	
+	    	
+	    	String[] files={"assessmenttemplate.html","background.jpg","cclicense.png","contentfunctions.js","launchpage.html","scormfunctions.js","style.css","styleC.css"};
+	    	
+	    	for (String string : files) {
+	    		Element FileUni = document.createElement("file"); 
+		        ResourceUni.appendChild(FileUni);
+		        
+		        {
+			        Attr Atr = document.createAttribute("href");
+			        Atr.setValue(string);
+			        FileUni.setAttributeNode(Atr);
+			        }
+			}
+	    	 
+		        
 		
 	}
 
@@ -424,6 +602,18 @@ private CompleteGrammar Quizz;
 					    Atr.setValue(MAINSTR);
 					    Item.setAttributeNode(Atr);
 					    Recursos.put(MAINSTR, Recurso);
+					    RecursosP.add(MAINSTR);
+					    
+					    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
+					    	if (IsQuiz(gramarApp.getViews()))
+					    		 {
+					    		RecursosQ.put(completeDocuments, Recurso);
+					    		 break;
+					    		 }
+						}
+					    
+					    
+					   
 					    }
 				        
 				        Element TitleI = document.createElement("title"); 
@@ -473,8 +663,8 @@ private CompleteGrammar Quizz;
 									
 									}
 									
-									
-									processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
+									if (!completeGrammarLHijo.isEmpty())
+										processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
 									
 								}
 							
@@ -673,6 +863,15 @@ private CompleteGrammar Quizz;
 				    Atr.setValue(MAINSTR);
 				    Item.setAttributeNode(Atr);
 				    Recursos.put(MAINSTR, Recurso);
+				    
+				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
+				    	if (IsQuiz(gramarApp.getViews()))
+				    		 {
+				    		RecursosQ.put(completeDocuments, Recurso);
+				    		 break;
+				    		 }
+					}
+				    
 				    }
 			        
 			        Element TitleI = document.createElement("title"); 
@@ -742,7 +941,7 @@ private CompleteGrammar Quizz;
 			CodigoHTML.append("<html>");
 			CodigoHTML.append("<head>");  
 			CodigoHTML.append("<title>"+EXPORTTEXT+"</title><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">"); 
-			CodigoHTML.append("<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"style.css\">");
+			CodigoHTML.append("<link rel=\"stylesheet\" type=\"text/css\" media=\"all\" href=\"styleC.css\">");
 			CodigoHTML.append("<meta name=\"description\" content=\"Informe generado por el sistema "+CLAVY+"\">");
 			Calendar C=new GregorianCalendar();
 			DateFormat df = new SimpleDateFormat ("yyyy-MM-dd");
@@ -873,7 +1072,7 @@ private CompleteGrammar Quizz;
 				
 				for (CompleteElementType completeST : completeGrammar.getSons()) {
 					
-					if (StaticFunctionsSCORM.isVisible(completeST))
+					if (StaticFunctionsSCORM.isVisible(completeST)&&!StaticFunctionsSCORM.isQOptions(completeST)&&!StaticFunctionsSCORM.isQAnswer(completeST))
 					{
 					
 					if (StaticFunctionsSCORM.isMap(completeST)&&StaticFunctionsSCORM.hasValuedChildren(completeST,completeDocuments.getDescription()))	
@@ -1122,7 +1321,7 @@ private CompleteGrammar Quizz;
 		 PrintWriter printw = null;
 		    
 		try {
-			 filewriter = new FileWriter(SOURCE_FOLDER+"\\style.css");//declarar el archivo
+			 filewriter = new FileWriter(SOURCE_FOLDER+"\\styleC.css");//declarar el archivo
 		     printw = new PrintWriter(filewriter);//declarar un impresor
 		          
 		     printw.println("li._Document {color: blue;}");
@@ -1699,7 +1898,8 @@ return null;
 		for (CompleteGrammar completeGrammar : metamodelGrammar) {
 			if (!IsIgnore(completeGrammar.getViews()))
 				Salida.add(completeGrammar);
-			if (!IsQuiz(completeGrammar.getViews()))
+			
+			if (IsQuiz(completeGrammar.getViews()))
 				Quizz=completeGrammar;
 		}
 		
@@ -1710,7 +1910,7 @@ return null;
 		for (CompleteOperationalValueType completeOperationalValueType : views) {
 			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Quiz".toLowerCase()))
 				try {
-					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
 					return Salida;
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -1724,7 +1924,7 @@ return null;
 		for (CompleteOperationalValueType completeOperationalValueType : views) {
 			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("ignore".toLowerCase()))
 				try {
-					boolean Salida = Boolean.getBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
 					return Salida;
 				} catch (Exception e) {
 					// TODO: handle exception

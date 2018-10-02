@@ -168,7 +168,7 @@ public class StaticFunctionsSCORM {
 
 	public static boolean isVisible(CompleteElementType completeST) {
 		for (CompleteOperationalValueType show : completeST.getShows()) {
-			if (show.getView().toLowerCase().equals("imscp")&&show.getName().toLowerCase().equals("visible"))
+			if (show.getView().toLowerCase().equals("scorm")&&show.getName().toLowerCase().equals("visible"))
 				return !show.getDefault().toLowerCase().equals("false");
 				
 		}
@@ -263,6 +263,34 @@ public class StaticFunctionsSCORM {
 			return null;
 		}
 		return null;
+	}
+
+	public static boolean isQOptions(CompleteElementType completeST) {
+		for (CompleteOperationalValueType completeOperationalValueType : completeST.getShows()) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Options".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
+	public static boolean isQAnswer(CompleteElementType completeST) {
+		for (CompleteOperationalValueType completeOperationalValueType : completeST.getShows()) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Answer".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
 	}
 
 }
