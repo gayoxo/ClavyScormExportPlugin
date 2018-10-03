@@ -87,7 +87,7 @@ public class SCORMPprocess {
 	private Element organizations;
 	private Element resources;
 	private HashMap<String, String> Recursos;
-	private HashSet<String> RecursosP;
+	private HashMap<String,CompleteDocuments> RecursosP;
 	private int contadorRec;
 	private String TextoEntrada;
 	private int contadorFiles;
@@ -139,7 +139,7 @@ private Element imssssequencingCollection;
 			}
 		
 		Recursos=new HashMap<String,String>();
-		RecursosP= new HashSet<>();
+		RecursosP= new HashMap<>();
 		RecursosQ=new HashMap<CompleteDocuments, String>();
 		try {
 			
@@ -167,11 +167,7 @@ private Element imssssequencingCollection;
 			    }
 	        
 	        
-	        {
-		        Attr Atr = document.createAttribute("xmlns");
-		        Atr.setValue("http://www.imsglobal.org/xsd/imscp_v1p1");
-		        manifest.setAttributeNode(Atr);
-		        }
+	       
 		        
 	        {
 			    Attr Atr = document.createAttribute("xmlns:xsi");
@@ -216,7 +212,11 @@ private Element imssssequencingCollection;
 			    }
 		        
 		       
-		        
+		        {
+			        Attr Atr = document.createAttribute("xmlns");
+			        Atr.setValue("http://www.imsglobal.org/xsd/imscp_v1p1");
+			        manifest.setAttributeNode(Atr);
+			        }
 		        
 		        {
 				Attr Atr = document.createAttribute("version");
@@ -242,8 +242,9 @@ private Element imssssequencingCollection;
 				organizations.setAttributeNode(Atr);
 			}
 	        processResources(document);
+	        creaJS();
 	        processSecuancing(document);
-	        
+	      
 	        
 	        //Generate XML
             Source source = new DOMSource(document);
@@ -275,6 +276,49 @@ private Element imssssequencingCollection;
 
 
 	
+	private void creaJS() {
+		FileWriter filewriter = null;
+		 PrintWriter printw = null;
+		    
+		 
+		 new File(SOURCE_FOLDER+"\\shared").mkdirs();
+		try {
+			 filewriter = new FileWriter(SOURCE_FOLDER+"\\shared\\pagerArray.js");//declarar el archivo
+		     printw = new PrintWriter(filewriter);//declarar un impresor
+		          
+		     printw.println(" function setArray(queryString) {   ");
+		     printw.println("var pageArray = new Array();");
+		     printw.println("switch (queryString){");
+		     
+		     
+		     for (Entry<String, CompleteDocuments> long1 : RecursosP.entrySet()) {
+		    	String ValorURL = Recursos.get(long1.getKey());
+		    	if (ValorURL!=null)
+		    	{
+		    		 printw.println("case \""+long1.getValue().getClavilenoid()+"\":");
+		    		 printw.println(" var pageArray = new Array(1);");
+		    		 printw.println("pageArray[0] = \""+ValorURL+"\";");
+		    		 printw.println("break;");
+		    	}
+		    	
+			}
+
+		     
+		     printw.println("default:");
+		     printw.println("alert(\"error, no match for '\" + queryString + \"'\");");
+		     printw.println("break;");
+		     printw.println("}");
+		     printw.println("return pageArray;");
+		     printw.println("}");
+		     
+		     printw.close();//cerramos el archivo
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeErrorException(new Error(e), "Error de archivo");
+		} 
+		
+	}
+
 	private void processSecuancing(Document document) {
 		Element imssssequencing = document.createElement("imsss:sequencing"); 
 		imssssequencingCollection.appendChild(imssssequencing);
@@ -395,11 +439,11 @@ private Element imssssequencingCollection;
 			    }
 		       
 		        
-		        {
-			        Attr Atr = document.createAttribute("href");
-			        Atr.setValue(recursotable.getValue());
-			        ResourceUni.setAttributeNode(Atr);
-			        }
+
+			        Attr href = document.createAttribute("href");
+			        href.setValue(recursotable.getValue());
+			        ResourceUni.setAttributeNode(href);
+
 			        
 		        Element FileUni = document.createElement("file"); 
 		        ResourceUni.appendChild(FileUni);
@@ -410,8 +454,19 @@ private Element imssssequencingCollection;
 			        FileUni.setAttributeNode(Atr);
 			        }
 
-		        if (RecursosP.contains(recursotable.getKey()))
+		        if (RecursosP.containsKey(recursotable.getKey()))
 		        {
+		        	
+		        	href.setValue("shared/launchpage.html?content="+RecursosP.get(recursotable.getKey()).getClavilenoid());
+		        	
+		        	{
+					    Attr Atr = document.createAttribute("adlcp:scormType");
+					    Atr.setValue("sco");
+					    ResourceUni.setAttributeNode(Atr);
+					    }
+		        	
+		        	
+		        	
 		        	 Element dependencyUni = document.createElement("dependency"); 
 				        ResourceUni.appendChild(dependencyUni);
 				        
@@ -476,7 +531,7 @@ private Element imssssequencingCollection;
 		        }
 	    	
 	    	
-	    	String[] files={"assessmenttemplate.html","background.jpg","cclicense.png","contentfunctions.js","launchpage.html","scormfunctions.js","style.css","styleC.css"};
+	    	String[] files={"shared/assessmenttemplate.html","shared/background.jpg","shared/cclicense.png","shared/contentfunctions.js","shared/launchpage.html","shared/scormfunctions.js","shared/style.css","styleC.css"};
 	    	
 	    	for (String string : files) {
 	    		Element FileUni = document.createElement("file"); 
@@ -602,7 +657,7 @@ private Element imssssequencingCollection;
 					    Atr.setValue(MAINSTR);
 					    Item.setAttributeNode(Atr);
 					    Recursos.put(MAINSTR, Recurso);
-					    RecursosP.add(MAINSTR);
+					    RecursosP.put(MAINSTR,completeDocuments);
 					    
 					    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
 					    	if (IsQuiz(gramarApp.getViews()))
