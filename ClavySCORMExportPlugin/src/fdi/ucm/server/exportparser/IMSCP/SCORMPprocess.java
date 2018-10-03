@@ -830,17 +830,76 @@ private Element imssssequencingCollection;
    	
    	if (Quizz!=null)
    	{
-   	Element ItemListT = document.createElement("item");
-	Organization.appendChild(ItemListT);
-   	}
+   	Element ItemT = document.createElement("item");
+	Organization.appendChild(ItemT);
 	
+	Attr AtrI = document.createAttribute("identifier");
+	AtrI.setValue("posttest_item");
+	imsssobjectives.setAttributeNode(AtrI);
 	
-	/*
-	 *<!--The individual tests are hidden so it all just looks like one post test to the learner.-->
-			<item identifier="posttest_item" >
-				<title>Post Test</title>
-
-				<item identifier="test_1" identifierref="assessment_resource" parameters="?content=assessment1" isvisible="false">
+	Element PostTestT = document.createElement("title");
+	ItemT.appendChild(PostTestT);
+	
+	Text nodeKeyValueTi = document.createTextNode("Post Test");
+	PostTestT.appendChild(nodeKeyValueTi);
+	//TODO
+	
+	int i=0;
+	for (Entry<CompleteDocuments, String> completeGrammar : RecursosQ.entrySet()) {
+		
+		Element ItemTH = document.createElement("item");
+		ItemT.appendChild(ItemTH);
+		
+		{
+			Attr Atr = document.createAttribute("identifier");
+			Atr.setValue("test_"+i);
+			ItemTH.setAttributeNode(Atr);
+		}
+		
+		{
+			Attr Atr = document.createAttribute("identifierref");
+			Atr.setValue("assessment_resource");
+			ItemTH.setAttributeNode(Atr);
+		}
+		
+		{
+			Attr Atr = document.createAttribute("parameters");
+			Atr.setValue("?content=q"+completeGrammar.getKey().getClavilenoid());
+			ItemTH.setAttributeNode(Atr);
+		}
+		
+		{
+			Attr Atr = document.createAttribute("isvisible");
+			Atr.setValue("false");
+			ItemTH.setAttributeNode(Atr);
+		}
+		
+		Element PostTestIT = document.createElement("title");
+		ItemTH.appendChild(PostTestIT);
+		
+		Text nodeKeyValueTIi = document.createTextNode("Quiz "+i++);
+		PostTestIT.appendChild(nodeKeyValueTIi);
+		
+		Element imssssequencingI = document.createElement("imsss:sequencing");
+		ItemTH.appendChild(imssssequencingI);
+		
+		{
+			Attr Atr = document.createAttribute("IDRef");
+			Atr.setValue("test_sequencing_rules");
+			imssssequencingI.setAttributeNode(Atr);
+		}
+		
+		Element adlnavpresentation = document.createElement("adlnav:presentation");
+		ItemTH.appendChild(adlnavpresentation);
+		Element adlnavnavigationInterface = document.createElement("adlnav:navigationInterface");
+		adlnavpresentation.appendChild(adlnavnavigationInterface);
+		Element adlnavhideLMSUI = document.createElement("adlnav:hideLMSUI");
+		adlnavnavigationInterface.appendChild(adlnavhideLMSUI);
+		Text adlnavhideLMSUIv = document.createTextNode("suspendAll");
+		adlnavhideLMSUI.appendChild(adlnavhideLMSUIv);
+		
+		/*
+		 * <item identifier="test_1" identifierref="assessment_resource" parameters="?content=assessment1" isvisible="false">
 					<title>Test 1</title>
 					<imsss:sequencing IDRef="test_sequencing_rules"></imsss:sequencing>
 					<adlnav:presentation>
@@ -849,21 +908,311 @@ private Element imssssequencingCollection;
 						</adlnav:navigationInterface>
 					</adlnav:presentation>
 				</item>
-				<item identifier="test_2" identifierref="assessment_resource" parameters="?content=assessment2" isvisible="false">
-					<title>Test 2</title>
-					<imsss:sequencing IDRef="test_sequencing_rules"></imsss:sequencing>
-					<adlnav:presentation>
-						<adlnav:navigationInterface>
-							<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
-						</adlnav:navigationInterface>
-					</adlnav:presentation>
-				</item>
-				
-				...
-	 */
+		 * */
+		}
 	
-	//SALIMOS DE WRAPOER Y EMPEZAMOS CON EL POSTTEST
 	
+	
+	Element imssssequencing2 = document.createElement("imsss:sequencing");
+	ItemT.appendChild(imssssequencing2);
+	
+	Element imssscontrolMode2 = document.createElement("imsss:controlMode");
+	imssssequencing2.appendChild(imssscontrolMode2);
+	
+	{
+		Attr Atr = document.createAttribute("choice");
+		Atr.setValue("false");
+		imssssequencing2.setAttributeNode(Atr);
+	}
+	
+	{
+		Attr Atr = document.createAttribute("flow");
+		Atr.setValue("true");
+		imssssequencing2.setAttributeNode(Atr);
+	}
+	
+	
+	{
+	Element imssssequencingRules2 = document.createElement("imsss:sequencingRules");
+	imssssequencing2.appendChild(imssssequencingRules2);
+	
+		
+		Element imssspreConditionRule2 = document.createElement("imsss:preConditionRule");
+		imssssequencingRules2.appendChild(imssspreConditionRule2);
+		
+		Element imsssruleConditions2 = document.createElement("imsss:ruleConditions");
+		imssspreConditionRule2.appendChild(imsssruleConditions2);
+		
+		{
+			Attr Atr = document.createAttribute("conditionCombination");
+			Atr.setValue("any");
+			imsssruleConditions2.setAttributeNode(Atr);
+		}
+	
+		
+
+		Element imsssruleCondition2 = document.createElement("imsss:ruleCondition");
+		imsssruleConditions2.appendChild(imsssruleCondition2);
+		
+		{
+			Attr Atr = document.createAttribute("referencedObjective");
+			Atr.setValue("content_completed");
+			imsssruleCondition2.setAttributeNode(Atr);
+		}
+		{
+			Attr Atr = document.createAttribute("operator");
+			Atr.setValue("not");
+			imsssruleCondition2.setAttributeNode(Atr);
+		}
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("satisfied");
+			imsssruleCondition2.setAttributeNode(Atr);
+		}
+		
+		Element imsssruleCondition_bis = document.createElement("imsss:ruleCondition");
+		imsssruleConditions2.appendChild(imsssruleCondition_bis);
+		
+		{
+			Attr Atr = document.createAttribute("referencedObjective");
+			Atr.setValue("content_completed");
+			imsssruleCondition_bis.setAttributeNode(Atr);
+		}
+		{
+			Attr Atr = document.createAttribute("operator");
+			Atr.setValue("not");
+			imsssruleCondition_bis.setAttributeNode(Atr);
+		}
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("objectiveStatusKnown");
+			imsssruleCondition_bis.setAttributeNode(Atr);
+		}
+		
+		
+		Element imsssruleAction2 = document.createElement("imsss:ruleAction");
+		imssspreConditionRule2.appendChild(imsssruleAction2);
+		
+		{
+			Attr Atr = document.createAttribute("action");
+			Atr.setValue("disabled");
+			imsssruleAction2.setAttributeNode(Atr);
+		}
+		
+		
+		Element imssspreConditionRule2_2 = document.createElement("imsss:preConditionRule");
+		imssssequencingRules2.appendChild(imssspreConditionRule2_2);
+		
+		Element imsssruleConditions2_2 = document.createElement("imsss:ruleConditions");
+		imssspreConditionRule2_2.appendChild(imsssruleConditions2_2);
+		
+		{
+			Attr Atr = document.createAttribute("conditionCombination");
+			Atr.setValue("any");
+			imsssruleConditions2_2.setAttributeNode(Atr);
+		}
+	
+		
+
+		Element imsssruleCondition2_2 = document.createElement("imsss:ruleCondition");
+		imsssruleConditions2_2.appendChild(imsssruleCondition2_2);
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("attemptLimitExceeded");
+			imsssruleCondition2_2.setAttributeNode(Atr);
+		}
+		
+		Element imsssruleCondition2_3 = document.createElement("imsss:ruleCondition");
+		imsssruleConditions2_2.appendChild(imsssruleCondition2_3);
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("satisfied");
+			imsssruleCondition2_3.setAttributeNode(Atr);
+		}
+		
+		
+		Element imsssruleAction2_2 = document.createElement("imsss:ruleAction");
+		imssspreConditionRule2_2.appendChild(imsssruleAction2_2);
+		
+		{
+			Attr Atr = document.createAttribute("action");
+			Atr.setValue("disabled");
+			imsssruleAction2_2.setAttributeNode(Atr);
+		}
+		
+		
+		//POS CONDICIONES
+		Element imssspostConditionRule2 = document.createElement("imsss:postConditionRule");
+		imssssequencingRules2.appendChild(imssspostConditionRule2);
+		{
+			Element imsssruleConditionsAb = document.createElement("imsss:ruleConditions");
+			imssspostConditionRule2.appendChild(imsssruleConditionsAb);
+			
+			{
+				Attr Atr = document.createAttribute("conditionCombination");
+				Atr.setValue("all");
+				imsssruleConditionsAb.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleConditionA = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionA);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("satisfied");
+				imsssruleConditionA.setAttributeNode(Atr);
+			}
+			
+			
+			{
+				Attr Atr = document.createAttribute("operator");
+				Atr.setValue("not");
+				imsssruleConditionA.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleConditionB = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionB);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("attemptLimitExceeded");
+				imsssruleConditionB.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("operator");
+				Atr.setValue("not");
+				imsssruleConditionB.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleActionAb = document.createElement("imsss:ruleAction");
+			imssspostConditionRule2.appendChild(imsssruleActionAb);
+			
+			{
+				Attr Atr = document.createAttribute("action");
+				Atr.setValue("retry");
+				imsssruleActionAb.setAttributeNode(Atr);
+			}
+			
+		}
+		
+		
+		Element imssspostConditionRule2_2 = document.createElement("imsss:postConditionRule");
+		imssssequencingRules2.appendChild(imssspostConditionRule2_2);
+		{
+			Element imsssruleConditionsAb = document.createElement("imsss:ruleConditions");
+			imssspostConditionRule2_2.appendChild(imsssruleConditionsAb);
+			
+			{
+				Attr Atr = document.createAttribute("conditionCombination");
+				Atr.setValue("all");
+				imsssruleConditionsAb.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleConditionA = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionA);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("objectiveStatusKnown");
+				imsssruleConditionA.setAttributeNode(Atr);
+			}
+			
+			
+			{
+				Attr Atr = document.createAttribute("operator");
+				Atr.setValue("not");
+				imsssruleConditionA.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleConditionB = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionB);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("attemptLimitExceeded");
+				imsssruleConditionB.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("operator");
+				Atr.setValue("not");
+				imsssruleConditionB.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleActionAb = document.createElement("imsss:ruleAction");
+			imssspostConditionRule2_2.appendChild(imsssruleActionAb);
+			
+			{
+				Attr Atr = document.createAttribute("action");
+				Atr.setValue("retry");
+				imsssruleActionAb.setAttributeNode(Atr);
+			}
+			
+		}
+		
+		Element imssspostConditionRule2_3 = document.createElement("imsss:postConditionRule");
+		imssssequencingRules2.appendChild(imssspostConditionRule2_3);
+		{
+			Element imsssruleConditionsAb = document.createElement("imsss:ruleConditions");
+			imssspostConditionRule2_3.appendChild(imsssruleConditionsAb);
+			
+			{
+				Attr Atr = document.createAttribute("conditionCombination");
+				Atr.setValue("any");
+				imsssruleConditionsAb.setAttributeNode(Atr);
+			}
+			
+			Element imsssruleConditionA = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionA);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("objectiveStatusKnown");
+				imsssruleConditionA.setAttributeNode(Atr);
+			}
+			
+			
+	
+			
+			Element imsssruleConditionB = document.createElement("imsss:ruleCondition");
+			imsssruleConditionsAb.appendChild(imsssruleConditionB);
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("attemptLimitExceeded");
+				imsssruleConditionB.setAttributeNode(Atr);
+			}
+			
+		
+			
+			Element imsssruleActionAb = document.createElement("imsss:ruleAction");
+			imssspostConditionRule2_3.appendChild(imsssruleActionAb);
+			
+			{
+				Attr Atr = document.createAttribute("action");
+				Atr.setValue("exitAll");
+				imsssruleActionAb.setAttributeNode(Atr);
+			}
+			
+		}
+		
+		Element imssslimitConditions2 = document.createElement("imsss:limitConditions");
+		imssssequencing2.appendChild(imssslimitConditions2);
+		
+		{
+			Attr Atr = document.createAttribute("attemptLimit");
+			Atr.setValue("2");
+			imssslimitConditions2.setAttributeNode(Atr);
+		}
+		
+		
+		//rollupRules
+		Element imsssrollupRules2 = document.createElement("imsss:rollupRules");
+		imssssequencing2.appendChild(imsssrollupRules2);
+	}
+	
+	
+	
+   	}
+	
+	
+	
+	//Fuera de QUiz falta un secuencing
 	
 		return NameBlock;
 	}
