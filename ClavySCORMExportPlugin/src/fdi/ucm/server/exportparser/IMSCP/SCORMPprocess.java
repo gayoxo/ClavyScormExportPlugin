@@ -844,7 +844,7 @@ private Element imssssequencingCollection;
 	PostTestT.appendChild(nodeKeyValueTi);
 	//TODO
 	
-	int i=0;
+	int i=1;
 	for (Entry<CompleteDocuments, String> completeGrammar : RecursosQ.entrySet()) {
 		
 		Element ItemTH = document.createElement("item");
@@ -922,13 +922,13 @@ private Element imssssequencingCollection;
 	{
 		Attr Atr = document.createAttribute("choice");
 		Atr.setValue("false");
-		imssssequencing2.setAttributeNode(Atr);
+		imssscontrolMode2.setAttributeNode(Atr);
 	}
 	
 	{
 		Attr Atr = document.createAttribute("flow");
 		Atr.setValue("true");
-		imssssequencing2.setAttributeNode(Atr);
+		imssscontrolMode2.setAttributeNode(Atr);
 	}
 	
 	
