@@ -897,18 +897,6 @@ private Element imssssequencingCollection;
 		adlnavnavigationInterface.appendChild(adlnavhideLMSUI);
 		Text adlnavhideLMSUIv = document.createTextNode("suspendAll");
 		adlnavhideLMSUI.appendChild(adlnavhideLMSUIv);
-		
-		/*
-		 * <item identifier="test_1" identifierref="assessment_resource" parameters="?content=assessment1" isvisible="false">
-					<title>Test 1</title>
-					<imsss:sequencing IDRef="test_sequencing_rules"></imsss:sequencing>
-					<adlnav:presentation>
-						<adlnav:navigationInterface>
-							<adlnav:hideLMSUI>suspendAll</adlnav:hideLMSUI>
-						</adlnav:navigationInterface>
-					</adlnav:presentation>
-				</item>
-		 * */
 		}
 	
 	
@@ -1200,18 +1188,255 @@ private Element imssssequencingCollection;
 			imssslimitConditions2.setAttributeNode(Atr);
 		}
 		
-		
+		{
 		//rollupRules
 		Element imsssrollupRules2 = document.createElement("imsss:rollupRules");
 		imssssequencing2.appendChild(imsssrollupRules2);
+		
+		{
+		Element imsssrollupRule2 = document.createElement("imsss:rollupRule");
+		imsssrollupRules2.appendChild(imsssrollupRule2);
+		
+		{
+			Attr Atr = document.createAttribute("childActivitySet");
+			Atr.setValue("any");
+			imsssrollupRule2.setAttributeNode(Atr);
+		}
+		
+		Element imsssrollupConditions2 = document.createElement("imsss:rollupConditions");
+		imsssrollupRule2.appendChild(imsssrollupConditions2);
+		
+		Element imsssrollupCondition2 = document.createElement("imsss:rollupCondition");
+		imsssrollupConditions2.appendChild(imsssrollupCondition2);
+		
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("satisfied");
+			imsssrollupCondition2.setAttributeNode(Atr);
+		}
+		
+		Element imsssrollupAction2 = document.createElement("imsss:rollupAction");
+		imsssrollupRule2.appendChild(imsssrollupAction2);
+		
+		{
+			Attr Atr = document.createAttribute("action");
+			Atr.setValue("satisfied");
+			imsssrollupAction2.setAttributeNode(Atr);
+		}
+		
+		}
+		
+		
+		{
+			Element imsssrollupRule2 = document.createElement("imsss:rollupRule");
+			imsssrollupRules2.appendChild(imsssrollupRule2);
+			
+			{
+				Attr Atr = document.createAttribute("childActivitySet");
+				Atr.setValue("any");
+				imsssrollupRule2.setAttributeNode(Atr);
+			}
+			
+			Element imsssrollupConditions2 = document.createElement("imsss:rollupConditions");
+			imsssrollupRule2.appendChild(imsssrollupConditions2);
+			
+			Element imsssrollupCondition2 = document.createElement("imsss:rollupCondition");
+			imsssrollupConditions2.appendChild(imsssrollupCondition2);
+			
+			{
+				Attr Atr = document.createAttribute("condition");
+				Atr.setValue("satisfied");
+				imsssrollupCondition2.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("operator");
+				Atr.setValue("not");
+				imsssrollupCondition2.setAttributeNode(Atr);
+			}
+			
+			Element imsssrollupAction2 = document.createElement("imsss:rollupAction");
+			imsssrollupRule2.appendChild(imsssrollupAction2);
+			
+			{
+				Attr Atr = document.createAttribute("action");
+				Atr.setValue("notSatisfied");
+				imsssrollupAction2.setAttributeNode(Atr);
+			}
+			
+			}
+		
+		
+		
+		}
+		
+		{
+			
+			
+			
+			Element imsssobjectives2 = document.createElement("imsss:objectives");
+			imssssequencing2.appendChild(imsssobjectives2);
+			
+			{
+			Element imsssprimaryObjective2 = document.createElement("imsss:primaryObjective");
+			imsssobjectives2.appendChild(imsssprimaryObjective2);
+			{
+				Attr Atr = document.createAttribute("objectiveID");
+				Atr.setValue("course_score");
+				imsssprimaryObjective2.setAttributeNode(Atr);
+			}
+			
+			Element imsssmapInfo2 = document.createElement("imsss:mapInfo");
+			imsssprimaryObjective2.appendChild(imsssmapInfo2);
+			{
+				Attr Atr = document.createAttribute("targetObjectiveID");
+				Atr.setValue(IDBase + ".course_score");
+				imsssmapInfo2.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("readSatisfiedStatus");
+				Atr.setValue("false");
+				imsssmapInfo2.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("readNormalizedMeasure");
+				Atr.setValue("true");
+				imsssmapInfo2.setAttributeNode(Atr);
+			}
+			
+			}
+			
+			
+			
+			{
+				Element imsssprimaryObjective2 = document.createElement("imsss:objective");
+				imsssobjectives2.appendChild(imsssprimaryObjective2);
+				{
+					Attr Atr = document.createAttribute("objectiveID");
+					Atr.setValue("content_completed");
+					imsssprimaryObjective2.setAttributeNode(Atr);
+				}
+				
+				Element imsssmapInfo2 = document.createElement("imsss:mapInfo");
+				imsssprimaryObjective2.appendChild(imsssmapInfo2);
+				{
+					Attr Atr = document.createAttribute("targetObjectiveID");
+					Atr.setValue(IDBase + ".content_completed");
+					imsssmapInfo2.setAttributeNode(Atr);
+				}
+				
+				{
+					Attr Atr = document.createAttribute("readSatisfiedStatus");
+					Atr.setValue("false");
+					imsssmapInfo2.setAttributeNode(Atr);
+				}
+				
+			}
+			
+			Element imsssrandomizationControls2 = document.createElement("imsss:randomizationControls");
+			imssssequencing2.appendChild(imsssrandomizationControls2);
+			
+			{
+				Attr Atr = document.createAttribute("randomizationTiming");
+				Atr.setValue("onEachNewAttempt");
+				imsssrandomizationControls2.setAttributeNode(Atr);
+			}
+			
+			{
+				Attr Atr = document.createAttribute("reorderChildren");
+				Atr.setValue("true");
+				imsssrandomizationControls2.setAttributeNode(Atr);
+			}
+			
+			
+
+			
+//			primaryObjective
+		}
 	}
 	
 	
 	
    	}
 	
+	//sequencing
+   	Element imsssequencingOut = document.createElement("imsss:sequencing");
+	Organization.appendChild(imsssequencingOut);
+
+	Element imsscontrolModeOut = document.createElement("imsss:controlMode");
+	imsssequencingOut.appendChild(imsscontrolModeOut);
+   	
+	{
+		Attr Atr = document.createAttribute("choice");
+		Atr.setValue("true");
+		imsssequencingOut.setAttributeNode(Atr);
+	}
 	
-	
+	{
+		Attr Atr = document.createAttribute("flow");
+		Atr.setValue("true");
+		imsssequencingOut.setAttributeNode(Atr);
+	}
+   	
+	{
+		
+		Element imsssrollupRules2 = document.createElement("imsss:rollupRules");
+		imsssequencingOut.appendChild(imsssrollupRules2);
+		
+		//POR AQUI
+		
+		Element imsssrollupRule2 = document.createElement("imsss:rollupRule");
+		imsssrollupRules2.appendChild(imsssrollupRule2);
+		
+		{
+			Attr Atr = document.createAttribute("childActivitySet");
+			Atr.setValue("any");
+			imsssrollupRule2.setAttributeNode(Atr);
+		}
+		
+		Element imsssrollupConditions2 = document.createElement("imsss:rollupConditions");
+		imsssrollupRule2.appendChild(imsssrollupConditions2);
+		
+		{
+			Attr Atr = document.createAttribute("conditionCombination");
+			Atr.setValue("any");
+			imsssrollupConditions2.setAttributeNode(Atr);
+		}
+		
+		Element imsssrollupCondition2 = document.createElement("imsss:rollupCondition");
+		imsssrollupConditions2.appendChild(imsssrollupCondition2);
+		
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("satisfied");
+			imsssrollupCondition2.setAttributeNode(Atr);
+		}
+		
+		
+		Element imsssrollupCondition2_2 = document.createElement("imsss:rollupCondition");
+		imsssrollupConditions2.appendChild(imsssrollupCondition2_2);
+		
+		{
+			Attr Atr = document.createAttribute("condition");
+			Atr.setValue("attemptLimitExceeded");
+			imsssrollupCondition2_2.setAttributeNode(Atr);
+		}
+		
+
+		
+		Element imsssrollupAction2 = document.createElement("imsss:rollupAction");
+		imsssrollupRule2.appendChild(imsssrollupAction2);
+		
+		{
+			Attr Atr = document.createAttribute("action");
+			Atr.setValue("completed");
+			imsssrollupAction2.setAttributeNode(Atr);
+		}
+		
+		}
+   	
 	//Fuera de QUiz falta un secuencing
 	
 		return NameBlock;
