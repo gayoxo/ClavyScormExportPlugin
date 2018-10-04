@@ -102,6 +102,7 @@ public class SCORMPprocess {
 private String IDBase;
 private CompleteGrammar Quizz;
 private Element imssssequencingCollection;
+private String IDQUEST;
 
 	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
@@ -149,6 +150,7 @@ private Element imssssequencingCollection;
 			
 			
 			IDBase="com.medpix.clavy."+SN+".sequencing.randomtest";
+			IDQUEST="com.medpix.clavy."+SN+".interactions";
 			
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder builder = factory.newDocumentBuilder();
@@ -243,6 +245,7 @@ private Element imssssequencingCollection;
 			}
 	        processResources(document);
 	        creaJS();
+	        creaJSTest();
 	        processSecuancing(document);
 	      
 	        
@@ -276,6 +279,199 @@ private Element imssssequencingCollection;
 
 
 	
+	private void creaJSTest() {
+		//RecursosQ
+		if (Quizz!=null)
+		for (Entry<CompleteDocuments, String> entry2 : RecursosQ.entrySet()) {
+			FileWriter filewriter = null;
+			 PrintWriter printw = null;
+			    
+			 
+			try {
+				 filewriter = new FileWriter(SOURCE_FOLDER+"q"+entry2.getKey().getClavilenoid()+"_questions.js");//declarar el archivo
+			     printw = new PrintWriter(filewriter);//declarar un impresor
+			          
+			     
+			     List<Long> ListaOpciones=getOptions(Quizz.getSons());
+			     int solucion=getSolution(Quizz.getSons(),entry2.getKey().getDescription());
+			     String pregunta=getQuestion(Quizz.getSons(),entry2.getKey().getDescription());
+			     
+			     List<CompleteElement> OpcioneDesorden=new ArrayList<CompleteElement>(); 
+			     
+			     for (CompleteElement elem : entry2.getKey().getDescription()) 
+					if (ListaOpciones.contains(elem.getHastype()))
+						OpcioneDesorden.add(elem);
+				
+			     List<CompleteElement> OpcioneOrden=new ArrayList<CompleteElement>(); 
+			     
+			     for (Long completeElement : ListaOpciones) 
+					for (CompleteElement completeElement2 : OpcioneDesorden) 
+						if (completeElement2.getHastype().equals(completeElement))
+							{
+							OpcioneOrden.add(completeElement2);
+							break;
+							}
+					
+			     
+			     printw.println(" test.AddQuestion( new Question (\""+IDQUEST+".q"+entry2.getKey().getClavilenoid()+"_1\",");
+				 printw.println(" \""+pregunta+"\",");
+				 printw.println(" QUESTION_TYPE_CHOICE,");
+				 
+				 boolean primer=true;
+				 printw.print("new Array(");
+				for (CompleteElement completeElement : OpcioneOrden) {
+					if (!primer)
+						printw.print(",");	
+					else
+						primer=false;
+					
+					 if (completeElement instanceof CompleteTextElement)
+						 printw.print("\""+((CompleteTextElement)completeElement).getValue()+"\"");
+				}
+				printw.println("),");				
+				
+				String SoluS="";
+				if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion-1) instanceof CompleteTextElement))
+						 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion-1)).getValue();
+				printw.println(" \""+SoluS+"\",");
+				 
+				printw.println(" \"obj_playing\")"); 
+				printw.println(");"); 
+			     
+			     printw.close();//cerramos el archivo
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeErrorException(new Error(e), "Error de archivo");
+			} 
+		}
+		
+		
+		
+	}
+
+	private List<Long> getOptions(ArrayList<CompleteElementType> elemtq) {
+		CompleteElementType OptionsS=null;
+		for (CompleteElementType completeElementt : elemtq)
+			if (IsOptions(completeElementt.getShows()))
+				{
+				if (completeElementt.getClassOfIterator()!=null)
+					OptionsS=completeElementt.getClassOfIterator();
+				else
+					OptionsS=completeElementt;
+				break;
+				}
+		
+		List<Long> Salida=new ArrayList<>();
+		for (CompleteElementType completeElementType : elemtq)
+			if (completeElementType.getClassOfIterator()==OptionsS||completeElementType==OptionsS)
+				Salida.add(completeElementType.getClavilenoid());
+		
+		
+		return Salida;
+	}
+
+	
+
+	private int getSolution(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsAnswer(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if ((completeElement instanceof CompleteTextElement)
+						&&completeElement.getHastype().equals(completeElementt.getClavilenoid()))
+						{
+						try {
+							String SolS=  ((CompleteTextElement) completeElement).getValue();
+							Integer Sol=Integer.parseInt(SolS);
+							return Sol;
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+						}
+				}
+				return -1;
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						int Salida = getSolution(completeElement.getSons(), description);
+						if (Salida>0)
+							return Salida;
+					}
+				}
+		}
+		return -1;
+	}
+
+	private String getQuestion(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsQuestion(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if ((completeElement instanceof CompleteTextElement)
+						&&completeElement.getHastype().equals(completeElementt.getClavilenoid()))
+						{
+						return  ((CompleteTextElement) completeElement).getValue();
+						}
+				}
+				return "no text";
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						String Salida = getQuestion(completeElement.getSons(), description);
+						if (Salida!=null)
+							return Salida;
+					}
+				}
+		}
+		return "no text";
+	}
+
+	private boolean IsQuestion(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("question".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
+	
+	private boolean IsOptions(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("options".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
+	private boolean IsAnswer(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Answer".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
 	private void creaJS() {
 		FileWriter filewriter = null;
 		 PrintWriter printw = null;
