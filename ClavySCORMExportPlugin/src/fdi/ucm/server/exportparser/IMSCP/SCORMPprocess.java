@@ -288,7 +288,7 @@ private String IDQUEST;
 			    
 			 
 			try {
-				 filewriter = new FileWriter(SOURCE_FOLDER+"q"+entry2.getKey().getClavilenoid()+"_questions.js");//declarar el archivo
+				 filewriter = new FileWriter(SOURCE_FOLDER+File.separator+"q"+entry2.getKey().getClavilenoid()+"_questions.js");//declarar el archivo
 			     printw = new PrintWriter(filewriter);//declarar un impresor
 			          
 			     
@@ -299,14 +299,14 @@ private String IDQUEST;
 			     List<CompleteElement> OpcioneDesorden=new ArrayList<CompleteElement>(); 
 			     
 			     for (CompleteElement elem : entry2.getKey().getDescription()) 
-					if (ListaOpciones.contains(elem.getHastype()))
+					if (ListaOpciones.contains(elem.getHastype().getClavilenoid()))
 						OpcioneDesorden.add(elem);
 				
 			     List<CompleteElement> OpcioneOrden=new ArrayList<CompleteElement>(); 
 			     
 			     for (Long completeElement : ListaOpciones) 
 					for (CompleteElement completeElement2 : OpcioneDesorden) 
-						if (completeElement2.getHastype().equals(completeElement))
+						if (completeElement2.getHastype().getClavilenoid().equals(completeElement))
 							{
 							OpcioneOrden.add(completeElement2);
 							break;
@@ -696,7 +696,7 @@ private String IDQUEST;
 	        
 	    	{
 		        Attr Atr = document.createAttribute("adlcp:scormType");
-		        Atr.setValue("asset");
+		        Atr.setValue("sco");
 		        ResourceUniA.setAttributeNode(Atr);
 		        }
 	    	
@@ -706,7 +706,13 @@ private String IDQUEST;
 		        ResourceUniA.setAttributeNode(Atr);
 		        }
 		        
-		
+	    	Element dependen = document.createElement("dependency"); 
+	    	ResourceUniA.appendChild(dependen);
+	    	{
+		        Attr Atr = document.createAttribute("identifierref");
+		        Atr.setValue("common_files");
+		        ResourceUniA.setAttributeNode(Atr);
+		        }
 		
 		
 		Element ResourceUni = document.createElement("resource"); 
@@ -714,7 +720,7 @@ private String IDQUEST;
 		
 		{
 	        Attr Atr = document.createAttribute("identifier");
-	        Atr.setValue("assessment_resource");
+	        Atr.setValue("common_files");
 	        ResourceUni.setAttributeNode(Atr);
 	        }
 	        
