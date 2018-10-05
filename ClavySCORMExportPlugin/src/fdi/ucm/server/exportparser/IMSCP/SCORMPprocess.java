@@ -711,7 +711,7 @@ private String IDQUEST;
 	    	{
 		        Attr Atr = document.createAttribute("identifierref");
 		        Atr.setValue("common_files");
-		        ResourceUniA.setAttributeNode(Atr);
+		        dependen.setAttributeNode(Atr);
 		        }
 		
 		
