@@ -331,8 +331,12 @@ private String IDQUEST;
 				printw.println("),");				
 				
 				String SoluS="";
+				if (solucion>-1)
 				if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion-1) instanceof CompleteTextElement))
 						 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion-1)).getValue();
+				else;
+				else
+					System.out.println("No solucion for D="+entry2.getKey().getClavilenoid());
 				printw.println(" \""+SoluS+"\",");
 				 
 				printw.println(" \"obj_playing\")"); 
@@ -378,7 +382,7 @@ private String IDQUEST;
 				{
 				for (CompleteElement completeElement : description) {
 					if ((completeElement instanceof CompleteTextElement)
-						&&completeElement.getHastype().equals(completeElementt.getClavilenoid()))
+						&&completeElement.getHastype().equals(completeElementt))
 						{
 						try {
 							String SolS=  ((CompleteTextElement) completeElement).getValue();
@@ -410,7 +414,7 @@ private String IDQUEST;
 				{
 				for (CompleteElement completeElement : description) {
 					if ((completeElement instanceof CompleteTextElement)
-						&&completeElement.getHastype().equals(completeElementt.getClavilenoid()))
+						&&completeElement.getHastype().equals(completeElementt))
 						{
 						return  ((CompleteTextElement) completeElement).getValue();
 						}
