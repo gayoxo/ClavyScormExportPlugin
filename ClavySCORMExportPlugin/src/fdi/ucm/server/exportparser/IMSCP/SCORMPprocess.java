@@ -92,7 +92,7 @@ public class SCORMPprocess {
 	private String TextoEntrada;
 	private int contadorFiles;
 	protected static final String CLAVY="OdAClavy";
-	private HashMap<CompleteDocuments, String> RecursosQ;
+	private HashMap<CompleteDocuments, HashSet<CompleteDocuments>> RecursosQ;
 	protected HashMap<Long,String> TablaHTML;
 	protected HashMap<Long,HashSet<CompleteDocuments>> TablaHTMLLink;
 	private HashSet<CompleteDocuments> ProcesadosGeneral;
@@ -141,7 +141,7 @@ private String IDQUEST;
 		
 		Recursos=new HashMap<String,String>();
 		RecursosP= new HashMap<>();
-		RecursosQ=new HashMap<CompleteDocuments, String>();
+		RecursosQ=new HashMap<CompleteDocuments, HashSet<CompleteDocuments>>();
 		try {
 			
 			contadorRec=0;
@@ -247,7 +247,7 @@ private String IDQUEST;
 	        creaJS();
 	        creaJSTest();
 	        processSecuancing(document);
-	      
+	        processFilesBase();
 	        
 	        //Generate XML
             Source source = new DOMSource(document);
@@ -279,10 +279,72 @@ private String IDQUEST;
 
 
 	
+	private void processFilesBase() {
+		File folder = new File("staticfiles");
+		File[] listOfFiles = folder.listFiles();
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		        try {
+					copyFileUsingStream(file, new File(SOURCE_FOLDER+File.separatorChar+file.getName()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		    }
+		    else
+		    	if (file.isDirectory())
+		    	{
+		    		File Dir=new File(SOURCE_FOLDER+File.separatorChar+file.getName());
+		    		Dir.mkdirs();
+		    		processFilesBase(file,SOURCE_FOLDER+File.separatorChar+file.getName());
+		    	}
+		    
+		}
+	}
+
+	
+	private void processFilesBase(File dir, String dirD) {
+		File[] listOfFiles = dir.listFiles();
+		for (File file : listOfFiles) {
+		    if (file.isFile()) {
+		        try {
+					copyFileUsingStream(file, new File(dirD+File.separatorChar+file.getName()));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+		    }
+		    else
+		    	if (file.isDirectory())
+		    	{
+		    		File Dir=new File(dirD+File.separatorChar+file.getName());
+		    		Dir.mkdirs();
+		    		processFilesBase(file,dirD+File.separatorChar+file.getName());
+		    	}
+		    
+		}
+		
+	}
+
+	private static void copyFileUsingStream(File source, File dest) throws IOException {
+	    InputStream is = null;
+	    OutputStream os = null;
+	    try {
+	        is = new FileInputStream(source);
+	        os = new FileOutputStream(dest);
+	        byte[] buffer = new byte[1024];
+	        int length;
+	        while ((length = is.read(buffer)) > 0) {
+	            os.write(buffer, 0, length);
+	        }
+	    } finally {
+	        is.close();
+	        os.close();
+	    }
+	}
+	
 	private void creaJSTest() {
 		//RecursosQ
 		if (Quizz!=null)
-		for (Entry<CompleteDocuments, String> entry2 : RecursosQ.entrySet()) {
+		for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> entry2 : RecursosQ.entrySet()) {
 			FileWriter filewriter = null;
 			 PrintWriter printw = null;
 			    
@@ -292,13 +354,15 @@ private String IDQUEST;
 			     printw = new PrintWriter(filewriter);//declarar un impresor
 			          
 			     
+			     for (CompleteDocuments preguntaE : entry2.getValue()) {
+			     
 			     List<Long> ListaOpciones=getOptions(Quizz.getSons());
-			     int solucion=getSolution(Quizz.getSons(),entry2.getKey().getDescription());
-			     String pregunta=getQuestion(Quizz.getSons(),entry2.getKey().getDescription());
+			     int solucion=getSolution(Quizz.getSons(),preguntaE.getDescription());
+			     String pregunta=getQuestion(Quizz.getSons(),preguntaE.getDescription());
 			     
 			     List<CompleteElement> OpcioneDesorden=new ArrayList<CompleteElement>(); 
 			     
-			     for (CompleteElement elem : entry2.getKey().getDescription()) 
+			     for (CompleteElement elem : preguntaE.getDescription()) 
 					if (ListaOpciones.contains(elem.getHastype().getClavilenoid()))
 						OpcioneDesorden.add(elem);
 				
@@ -312,37 +376,43 @@ private String IDQUEST;
 							break;
 							}
 					
+			   
 			     
-			     printw.println(" test.AddQuestion( new Question (\""+IDQUEST+".q"+entry2.getKey().getClavilenoid()+"_1\",");
-				 printw.println(" \""+pregunta+"\",");
-				 printw.println(" QUESTION_TYPE_CHOICE,");
-				 
-				 boolean primer=true;
-				 printw.print("new Array(");
-				for (CompleteElement completeElement : OpcioneOrden) {
-					if (!primer)
-						printw.print(",");	
-					else
-						primer=false;
+			    	 printw.println(" test.AddQuestion( new Question (\""+IDQUEST+".q"+preguntaE.getClavilenoid()+"_1\",");
+					 printw.println(" \""+pregunta+"\",");
+					 printw.println(" QUESTION_TYPE_CHOICE,");
+					 
+					 boolean primer=true;
+					 printw.print("new Array(");
+					for (CompleteElement completeElement : OpcioneOrden) {
+						if (!primer)
+							printw.print(",");	
+						else
+							primer=false;
+						
+						 if (completeElement instanceof CompleteTextElement)
+							 printw.print("\""+((CompleteTextElement)completeElement).getValue()+"\"");
+					}
+					printw.println("),");				
 					
-					 if (completeElement instanceof CompleteTextElement)
-						 printw.print("\""+((CompleteTextElement)completeElement).getValue()+"\"");
+					String SoluS="";
+					if (solucion>-1)
+					if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion-1) instanceof CompleteTextElement))
+							 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion-1)).getValue();
+					else;
+					else
+						System.out.println("No solucion for D="+preguntaE.getClavilenoid());
+					printw.println(" \""+SoluS+"\",");
+					 
+					printw.println(" \"obj_playing\")"); 
+					printw.println(");"); 
+				     
+				    
 				}
-				printw.println("),");				
-				
-				String SoluS="";
-				if (solucion>-1)
-				if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion-1) instanceof CompleteTextElement))
-						 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion-1)).getValue();
-				else;
-				else
-					System.out.println("No solucion for D="+entry2.getKey().getClavilenoid());
-				printw.println(" \""+SoluS+"\",");
-				 
-				printw.println(" \"obj_playing\")"); 
-				printw.println(");"); 
 			     
-			     printw.close();//cerramos el archivo
+			     printw.close();//cerramos el archivo  
+			     
+			     
 			} catch (Exception e) {
 				e.printStackTrace();
 				throw new RuntimeErrorException(new Error(e), "Error de archivo");
@@ -501,6 +571,28 @@ private String IDQUEST;
 		    		 printw.println("break;");
 		    	}
 		    	
+			}
+		     
+		     
+		     /*
+		      * 
+		      * 		for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> entry2 : RecursosQ.entrySet()) {
+			FileWriter filewriter = null;
+			 PrintWriter printw = null;
+			    
+			 
+			try {
+				 filewriter = new FileWriter(SOURCE_FOLDER+File.separator+"q"+entry2.getKey().getClavilenoid()+"_questions.js");//declarar el archivo
+		      * 
+		      */
+		     
+		     for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> entry2 : RecursosQ.entrySet()) {
+
+			    		 printw.println("case \"q"+entry2.getKey().getClavilenoid()+"\":");
+			    		 printw.println(" var pageArray = new Array(1);");
+			    		 printw.println("pageArray[0] = \"shared/assessmenttemplate.html?questions=q"+entry2.getKey().getClavilenoid()+"\";");
+			    		 printw.println("break;");
+
 			}
 
 		     
@@ -865,15 +957,8 @@ private String IDQUEST;
 					    Recursos.put(MAINSTR, Recurso);
 					    RecursosP.put(MAINSTR,completeDocuments);
 					    
-					    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
-					    	if (IsQuiz(gramarApp.getViews()))
-					    		 {
-					    		RecursosQ.put(completeDocuments, Recurso);
-					    		 break;
-					    		 }
-						}
 					    
-					    
+
 					   
 					    }
 				        
@@ -908,6 +993,7 @@ private String IDQUEST;
 					        
 					     
 					     for (CompleteDocuments completedocHijo : ListaLinkeados) {
+					    	 
 								if (!Procesados.contains(completedocHijo))
 								{
 									Procesados.add(completedocHijo);
@@ -923,6 +1009,22 @@ private String IDQUEST;
 									
 									
 									}
+									
+									 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
+									    	if (IsQuiz(gramarApp.getViews()))
+									    		 {
+									    		
+									    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
+									    		if (List==null)
+									    			List=new HashSet<CompleteDocuments>();
+									    		
+									    		List.add(completedocHijo);
+									    		
+									    		RecursosQ.put(completeDocuments, List);
+									    		 break;
+									    		 }
+										}
+									
 									
 									if (!completeGrammarLHijo.isEmpty())
 										processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
@@ -1048,10 +1150,9 @@ private String IDQUEST;
 	
 	Text nodeKeyValueTi = document.createTextNode("Post Test");
 	PostTestT.appendChild(nodeKeyValueTi);
-	//TODO
 	
 	int i=1;
-	for (Entry<CompleteDocuments, String> completeGrammar : RecursosQ.entrySet()) {
+	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> completeGrammar : RecursosQ.entrySet()) {
 		
 		Element ItemTH = document.createElement("item");
 		ItemT.appendChild(ItemTH);
@@ -1699,13 +1800,13 @@ private String IDQUEST;
 				    Item.setAttributeNode(Atr);
 				    Recursos.put(MAINSTR, Recurso);
 				    
-				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
-				    	if (IsQuiz(gramarApp.getViews()))
-				    		 {
-				    		RecursosQ.put(completeDocuments, Recurso);
-				    		 break;
-				    		 }
-					}
+//				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
+//				    	if (IsQuiz(gramarApp.getViews()))
+//				    		 {
+//				    		RecursosQ.put(completeDocuments, Recurso);
+//				    		 break;
+//				    		 }
+//					}
 				    
 				    }
 			        
@@ -1740,7 +1841,20 @@ private String IDQUEST;
 								}
 								
 								
-								 
+								 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
+								    	if (IsQuiz(gramarApp.getViews()))
+								    		 {
+								    		
+								    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
+								    		if (List==null)
+								    			List=new HashSet<CompleteDocuments>();
+								    		
+								    		List.add(completedocHijo);
+								    		
+								    		RecursosQ.put(completeDocuments, List);
+								    		 break;
+								    		 }
+									}
 						    	
 								
 								
