@@ -11,13 +11,14 @@
     var QUESTION_TYPE_TF = "true-false";
     var QUESTION_TYPE_NUMERIC = "numeric";
     
-    function Question(id, text, type, answers, correctAnswer, objectiveId){
+    function Question(id, text, type, answers, correctAnswer, objectiveId,icon){
         this.Id = id;
         this.Text = text;
         this.Type = type;
         this.Answers = answers;
         this.CorrectAnswer = correctAnswer;
         this.ObjectiveId = objectiveId;
+        this.Icon = icon;
     }
 
     function Test(questions){
@@ -29,6 +30,8 @@
     }
     
     var test = new Test(new Array());
+    
+    
 </script>
 
 <script type="text/javascript">
@@ -149,6 +152,10 @@ for (var i=0; i<includeFiles.length; i++){
         for (var i in test.Questions){
             var question = test.Questions[i];
             
+            //TODO
+            if (!(0 === question.Icon.length))
+         		document.write ("<img src=\""+question.Icon+"\" alt=\"imge\">");
+            
             document.write ("<div id='question_" + question.Id + "' class='question'>");
             document.write (question.Text);
             
@@ -222,7 +229,7 @@ xhr.send();
 
 <div id='info'>
 </div>
-<h1>Knowledge Check</h1>
+<h1>Quiz</h1>
 <script type="text/javascript">
 RenderCode(test);
 RenderTest(test);

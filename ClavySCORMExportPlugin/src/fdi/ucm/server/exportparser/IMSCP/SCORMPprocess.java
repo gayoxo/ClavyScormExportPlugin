@@ -359,6 +359,7 @@ private String IDQUEST;
 			     List<Long> ListaOpciones=getOptions(Quizz.getSons());
 			     int solucion=getSolution(Quizz.getSons(),preguntaE.getDescription());
 			     String pregunta=getQuestion(Quizz.getSons(),preguntaE.getDescription());
+			     String Imagen=getImage(Quizz.getSons(),preguntaE.getDescription());
 			     
 			     List<CompleteElement> OpcioneDesorden=new ArrayList<CompleteElement>(); 
 			     
@@ -404,7 +405,8 @@ private String IDQUEST;
 						System.out.println("No solucion for D="+preguntaE.getClavilenoid());
 					printw.println(" \""+SoluS+"\",");
 					 
-					printw.println(" \"obj_playing\")"); 
+					printw.println(" \"obj_playing\","); 
+					printw.println(" \""+Imagen+"\")"); 
 					printw.println(");"); 
 				     
 				    
@@ -421,6 +423,45 @@ private String IDQUEST;
 		
 		
 		
+	}
+
+	private String getImage(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsImage(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if ((completeElement instanceof CompleteTextElement)
+						&&completeElement.getHastype().equals(completeElementt))
+						{
+						return  ((CompleteTextElement) completeElement).getValue();
+						}
+				}
+				return "";
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						String Salida = getImage(completeElement.getSons(), description);
+						if (Salida!=null)
+							return Salida;
+					}
+				}
+		}
+		return "";
+	}
+
+	private boolean IsImage(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("qimage".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
 	}
 
 	private List<Long> getOptions(ArrayList<CompleteElementType> elemtq) {
