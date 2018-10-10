@@ -280,55 +280,141 @@ private String IDQUEST;
 
 	
 	private void processFilesBase() {
-		File folder = new File("staticfiles");
-		File[] listOfFiles = folder.listFiles();
-		for (File file : listOfFiles) {
-		    if (file.isFile()) {
-		        try {
-					copyFileUsingStream(file, new File(SOURCE_FOLDER+File.separatorChar+file.getName()));
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-		    }
-		    else
-		    	if (file.isDirectory())
-		    	{
-		    		File Dir=new File(SOURCE_FOLDER+File.separatorChar+file.getName());
-		    		Dir.mkdirs();
-		    		processFilesBase(file,SOURCE_FOLDER+File.separatorChar+file.getName());
-		    	}
-		    
-		}
-	}
 
-	
-	private void processFilesBase(File dir, String dirD) {
-		File[] listOfFiles = dir.listFiles();
-		for (File file : listOfFiles) {
-		    if (file.isFile()) {
-		        try {
-					copyFileUsingStream(file, new File(dirD+File.separatorChar+file.getName()));
+		String[] Lista={"adlcp_v1p3.xsd",
+				"adlnav_v1p3.xsd",
+				"adlseq_v1p3.xsd",
+				"datatypes.dtd",
+				"ims_xml.xsd",
+				"imscp_v1p1.xsd",
+				"imsss_v1p0.xsd",
+				"imsss_v1p0auxresource.xsd",
+				"imsss_v1p0control.xsd",
+				"imsss_v1p0delivery.xsd",
+				"imsss_v1p0limit.xsd",
+				"imsss_v1p0objective.xsd",
+				"imsss_v1p0random.xsd",
+				"imsss_v1p0rollup.xsd",
+				"imsss_v1p0seqrule.xsd",
+				"imsss_v1p0util.xsd",
+				"lom.xsd",
+				"xml.xsd",
+				"XMLSchema.dtd"};
+		
+		
+		for (String string : Lista) {
+
+//			try {
+//			URL url = this.getClass().getResource("/staticfiles/"+string);
+//			
+//				copyFileUsingStream(url.openStream(), new File(SOURCE_FOLDER+File.separatorChar+string));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+//			
+//			try {
+//			InputStream url = SCORMPprocess.class.getResourceAsStream("/staticfiles/"+string);
+//			
+//				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+string));
+//			} catch (Exception e) {
+//				e.printStackTrace();
+//			}
+			InputStream url = null;
+			try {
+				url = SCORMPprocess.class.getResourceAsStream("staticfiles/"+string);
+
+					copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+string));
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+					InputStream url2 = null;
+					try {
+						url2 = new URL("http://clavy.fdi.ucm.es/Clavy2Data/jars/staticfiles/"+string).openStream();
+
+							copyFileUsingStream(url2, new File(SOURCE_FOLDER+File.separatorChar+string));
+							
+						} catch (Exception e2) {
+							e2.printStackTrace();
+							
+							
+							
+						}finally {
+							try {
+								url2.close();
+							} catch (IOException e2){
+								e2.printStackTrace();
+							}
+						}
+				}
+			finally {
+				try {
+					url.close();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-		    }
-		    else
-		    	if (file.isDirectory())
-		    	{
-		    		File Dir=new File(dirD+File.separatorChar+file.getName());
-		    		Dir.mkdirs();
-		    		processFilesBase(file,dirD+File.separatorChar+file.getName());
-		    	}
-		    
+			}
+				
+			
 		}
+		
+		
+		File sha= new File(SOURCE_FOLDER+File.separatorChar+"shared");
+		sha.mkdirs();
+		
+		String[] ListaS={"assessmenttemplate.html",
+				"background.jpg",
+				"cclicense.png",
+				"contentfunctions.js",
+				"launchpage.html",
+				"scormfunctions.js",
+				"style.css"};
+		
+		InputStream url = null;
+		for (String string : ListaS) {
+//			URL url = this.getClass().getResource("/staticfiles/"+string);
+			url = SCORMPprocess.class.getResourceAsStream("staticfiles/shared/"+string);
+			try {
+				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+"shared"+File.separatorChar+string));
+			} catch (IOException e) {
+				e.printStackTrace();
+				InputStream url2 = null;
+				try {
+					url2 = new URL("http://clavy.fdi.ucm.es/Clavy2Data/jars/staticfiles/shared/"+string).openStream();
+
+						copyFileUsingStream(url2, new File(SOURCE_FOLDER+File.separatorChar+string));
+						
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						
+						
+						
+					}finally {
+						try {
+							url2.close();
+						} catch (IOException e2){
+							e2.printStackTrace();
+						}
+					}
+			}
+			finally {
+				try {
+					url.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
 		
 	}
 
-	private static void copyFileUsingStream(File source, File dest) throws IOException {
-	    InputStream is = null;
+
+	private static void copyFileUsingStream(InputStream source, File dest) throws IOException {
+	    InputStream is = source;
 	    OutputStream os = null;
 	    try {
-	        is = new FileInputStream(source);
+//	        is = new FileInputStream(source);
 	        os = new FileOutputStream(dest);
 	        byte[] buffer = new byte[1024];
 	        int length;
@@ -398,9 +484,9 @@ private String IDQUEST;
 					
 					String SoluS="";
 					if (solucion>-1)
-					if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion-1) instanceof CompleteTextElement))
-							 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion-1)).getValue();
-					else;
+						if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion) instanceof CompleteTextElement))
+								 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion)).getValue();
+						else;
 					else
 						System.out.println("No solucion for D="+preguntaE.getClavilenoid());
 					printw.println(" \""+SoluS+"\",");
@@ -430,10 +516,17 @@ private String IDQUEST;
 			if (IsImage(completeElementt.getShows()))
 				{
 				for (CompleteElement completeElement : description) {
-					if ((completeElement instanceof CompleteTextElement)
-						&&completeElement.getHastype().equals(completeElementt))
+					if (completeElement.getHastype().equals(completeElementt))
 						{
-						return  ((CompleteTextElement) completeElement).getValue();
+						if (completeElement instanceof CompleteResourceElementURL)
+							return  ((CompleteResourceElementURL) completeElement).getValue();
+						
+						//TODO AQUI REVISAR COMO ESTA PORQUEIGUAL EL PATH ES RARO
+						if (completeElement instanceof CompleteResourceElementFile)
+							return  ((CompleteResourceElementFile) completeElement).getValue().getPath();
+						
+						if (completeElement instanceof CompleteTextElement)
+							return  ((CompleteTextElement) completeElement).getValue();
 						}
 				}
 				return "";
@@ -888,7 +981,8 @@ private String IDQUEST;
 	}
 
 	private String processOrganization(
-			LinkedList<CompleteDocuments> completeDocumentsList, Document document,
+			LinkedList<CompleteDocuments> completeDocumentsList,
+			Document document,
 			ArrayList<CompleteGrammar> GramaticasAProcesar) {
 
 		String NameBlock = "MAIN_TOC" + completeDocumentsList.get(0).getClavilenoid();
@@ -939,6 +1033,9 @@ private String IDQUEST;
 		while (!completeDocumentsList.isEmpty()) {
 			CompleteDocuments completeDocuments = completeDocumentsList.removeLast();
 
+			
+			
+			
 			if (!ProcesadosGeneral.contains(completeDocuments)) {
 				ProcesadosGeneral.add(completeDocuments);
 				// }
@@ -966,7 +1063,10 @@ private String IDQUEST;
 //			    	 Gram_doc.put(completeGrammar, DocGram);
 //			    	 
 //			     } 
-		     
+			if (!GramaticasAplicadas.isEmpty())
+				
+			{	
+				
 		     String Grammarname="ID";
 	    	 if (GramaticasAplicadas.size()>0)
 	    		 Grammarname=GramaticasAplicadas.get(0).getNombre();
@@ -1067,12 +1167,12 @@ private String IDQUEST;
 										}
 									
 									
-									if (!completeGrammarLHijo.isEmpty())
+									if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
 										processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
 									
 								}
 							
-					     
+					     }		     
 					     
 			}
 		     
@@ -1840,6 +1940,8 @@ private String IDQUEST;
 				    Atr.setValue(MAINSTR);
 				    Item.setAttributeNode(Atr);
 				    Recursos.put(MAINSTR, Recurso);
+				    RecursosP.put(MAINSTR,completeDocuments);
+				    
 				    
 //				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
 //				    	if (IsQuiz(gramarApp.getViews()))
@@ -1882,24 +1984,24 @@ private String IDQUEST;
 								}
 								
 								
-								 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
-								    	if (IsQuiz(gramarApp.getViews()))
-								    		 {
-								    		
-								    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
-								    		if (List==null)
-								    			List=new HashSet<CompleteDocuments>();
-								    		
-								    		List.add(completedocHijo);
-								    		
-								    		RecursosQ.put(completeDocuments, List);
-								    		 break;
-								    		 }
-									}
+//								 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
+//								    	if (IsQuiz(gramarApp.getViews()))
+//								    		 {
+//								    		
+//								    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
+//								    		if (List==null)
+//								    			List=new HashSet<CompleteDocuments>();
+//								    		
+//								    		List.add(completedocHijo);
+//								    		
+//								    		RecursosQ.put(completeDocuments, List);
+//								    		 break;
+//								    		 }
+//									}
 						    	
 								
-								
-								processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
+								if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
+									 processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
 								
 							}
 						
