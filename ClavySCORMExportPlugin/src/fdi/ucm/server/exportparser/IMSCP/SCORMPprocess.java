@@ -509,6 +509,9 @@ private int counter=0;
 			     String pregunta=getQuestion(Quizz.getSons(),preguntaE.getDescription());
 			     String Imagen=getImage(Quizz.getSons(),preguntaE.getDescription());
 			     
+			     pregunta = pregunta.replace("\"", "\\\"");
+
+			     
 			     List<CompleteElement> OpcioneDesorden=new ArrayList<CompleteElement>(); 
 			     
 			     for (CompleteElement elem : preguntaE.getDescription()) 
@@ -540,14 +543,21 @@ private int counter=0;
 							primer=false;
 						
 						 if (completeElement instanceof CompleteTextElement)
-							 printw.print("\""+((CompleteTextElement)completeElement).getValue()+"\"");
+							 {
+							 String Respuesta= ((CompleteTextElement)completeElement).getValue();
+							 Respuesta = Respuesta.replace("\"", "\\\"");
+							 printw.print("\""+Respuesta+"\"");
+							 }
 					}
 					printw.println("),");				
 					
 					String SoluS="";
 					if (solucion>-1)
 						if (solucion<=OpcioneOrden.size()&&(OpcioneOrden.get(solucion) instanceof CompleteTextElement))
+								 {
 								 SoluS=((CompleteTextElement)OpcioneOrden.get(solucion)).getValue();
+								 SoluS = SoluS.replace("\"", "\\\"");
+								 }
 						else;
 					else
 						System.out.println("No solucion for D="+preguntaE.getClavilenoid());
