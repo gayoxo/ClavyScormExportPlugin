@@ -103,6 +103,7 @@ private String IDBase;
 private CompleteGrammar Quizz;
 private Element imssssequencingCollection;
 private String IDQUEST;
+private int counter=0;
 
 	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
@@ -2043,6 +2044,8 @@ private String IDQUEST;
 //			CodigoHTML.append("<style>");
 //			CodigoHTML.append("li.doc {color: blue;}");	
 //			CodigoHTML.append("</style>");
+			CodigoHTML.append("<link href=\"lightbox/css/lightbox.css\" rel=\"stylesheet\" />");
+			CodigoHTML.append("<script src=\"lightbox/js/lightbox-plus-jquery.js\"></script>"); 
 			CodigoHTML.append("<script type=\"text/javascript\" src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyBPj8iz7libsW74GvKYCU7VdtggaOA8814&amp;v=3&sensor=true&libraries=places\"></script> \n");
 			CodigoHTML.append("<script src=\"http://maps.google.com/maps/api/js\"></script> \n"+
   "<script src=\"gmaps.js\"></script> \n"+
@@ -2137,8 +2140,10 @@ private String IDQUEST;
 			 widthmini= 50;
 			 heightmini= (50*height)/width;
 
-			Document.append("<li> <span class=\"_Type Icon N_1\">Icon:</span> <img class=\"Icon _Value N_1V\" src=\""+
-			completeDocuments.getClavilenoid()+File.separator+NameS+"\" onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+";\" width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+Path+"\" /></li>");
+			Document.append("<li> <span class=\"_Type Icon N_1\">Icon:</span> <a data-lightbox=\"image_"+counter+++"\"  href=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" ><img class=\"Icon _Value N_1V\" src=\""+
+			completeDocuments.getClavilenoid()+File.separator+NameS+"\" "
+//					+ "onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+";\""
+							+ " width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+Path+"\" /></a></li>");
 			Document.append("<li> <span class=\"_Type Description N_2\">Description:</span> <span class=\"Description _Value N_0V\">"+textToHtmlConvertingURLsToLinks(completeDocuments.getDescriptionText())+"</span></li>");
 		
 			
@@ -2628,10 +2633,10 @@ private String IDQUEST;
 					 heightmini= (50*height)/width;
 					
 					
-					StringSalida.append("<li> <span class=\"_Type "+tipo+"\">"+((CompleteElementType)completeST).getName()+":</span> <img class=\"_ImagenOV "+tipo+"V \" src=\""+
-							completeDocuments.getClavilenoid()+File.separator+NameS+
-							"\" onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+
-							";\" width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" /> "+
+					StringSalida.append("<li> <span class=\"_Type "+tipo+"\">"+((CompleteElementType)completeST).getName()+":</span> <a data-lightbox=\"image_"+counter+++"\"  href=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" ><img class=\"_ImagenOV "+tipo+"V \" src=\""+
+							completeDocuments.getClavilenoid()+File.separator+NameS+"\""
+//									+ " onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+";\""
+											+ " width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" /> </a>"+
 //							"<span class=\""+tipo+"V _ClavyID _Value\">" +Linked.getClavilenoid()+"</span>"+
 							"<span class=\""+tipo+"V _DescriptionRel _Value\">" +textToHtmlConvertingURLsToLinks(Linked.getDescriptionText())+"</span></li>");
 					
@@ -2700,9 +2705,10 @@ private String IDQUEST;
 						
 						 StringSalida.append("<li> <span class=\"_Type "+tipo+"\">"+((CompleteElementType)completeST).getName()+":</span> " +
 //									"File Linked ->"+
-									"<a class=\"_LinkedRef "+tipo+"V "+tipo+"A  \" href=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" target=\"_blank\">"+
+									"<a data-lightbox=\"image_"+counter+++"\" class=\"_LinkedRef "+tipo+"V "+tipo+"A  \" href=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" target=\"_blank\">"+
 									" <img class=\"_ImagenFile "+tipo+"V \" class=\"ImagenOV\" src=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\"" +
-											" onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+";\" width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" />" +
+//											" onmouseover=\"this.width="+width+";this.height="+height+";\" onmouseout=\"this.width="+widthmini+";this.height="+heightmini+";\"" +
+													 " width=\""+widthmini+"\" height=\""+heightmini+"\" alt=\""+completeDocuments.getClavilenoid()+File.separator+NameS+"\" />" +
 											"</a></li>");	
 					
 					}
