@@ -160,7 +160,7 @@ for (var i=0; i<includeFiles.length; i++){
             
             var wasCorrect = false;
             var correctAnswer = null;
-            var learnerResponse = "";
+            var learnerResponse = -1;
             
             switch (question.Type){
                 case QUESTION_TYPE_CHOICE:
@@ -204,7 +204,8 @@ for (var i=0; i<includeFiles.length; i++){
                 break;
             }
             
-            if(learnerResponse != "") wasCorrect = (correctAnswer == learnerResponse);
+            wasCorrect = (correctAnswer == learnerResponse);
+            
             if (wasCorrect) {correctCount++;}
             
             if (parent.RecordQuestion){
