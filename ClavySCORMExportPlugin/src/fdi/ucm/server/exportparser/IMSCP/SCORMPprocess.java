@@ -370,13 +370,14 @@ private int counter=0;
 				"scormfunctions.js",
 				"style.css"};
 		
-		InputStream url = null;
+		
 		for (String string : ListaS) {
 //			URL url = this.getClass().getResource("/staticfiles/"+string);
-			url = SCORMPprocess.class.getResourceAsStream("staticfiles/shared/"+string);
+			InputStream url = null;
 			try {
+				url = SCORMPprocess.class.getResourceAsStream("staticfiles/shared/"+string);
 				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+"shared"+File.separatorChar+string));
-			} catch (IOException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				InputStream url2 = null;
 				try {
@@ -406,6 +407,66 @@ private int counter=0;
 			}
 		}
 		
+		File light= new File(SOURCE_FOLDER+File.separatorChar+"lightbox");
+		light.mkdirs();
+		light= new File(SOURCE_FOLDER+File.separatorChar+"lightbox"+File.separatorChar+"css");
+		light.mkdirs();
+		light= new File(SOURCE_FOLDER+File.separatorChar+"lightbox"+File.separatorChar+"images");
+		light.mkdirs();
+		light= new File(SOURCE_FOLDER+File.separatorChar+"lightbox"+File.separatorChar+"js");
+		light.mkdirs();
+		
+		String[] ListaL={"css/lightbox.css",
+				"css/lightbox.min.css",
+				"images/close.png",
+				"images/loading.gif",
+				"images/next.png",
+				"images/prev.png",
+				"js/lightbox-plus-jquery.js",
+				"js/lightbox-plus-jquery.min.js",
+				"js/lightbox-plus-jquery.min.map",
+				"js/lightbox.js",
+				"js/lightbox.min.js",
+				"js/lightbox.min.map"};
+		
+		
+		
+		
+		for (String string : ListaL) {
+//			URL url = this.getClass().getResource("/staticfiles/"+string);
+			InputStream url = null;
+			try {
+				url = SCORMPprocess.class.getResourceAsStream("staticfiles/lightbox/"+string);
+				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+"lightbox"+File.separatorChar+string));
+			} catch (Exception e) {
+				e.printStackTrace();
+				InputStream url2 = null;
+				try {
+					url2 = new URL("http://clavy.fdi.ucm.es/Clavy2Data/jars/staticfiles/lightbox/"+string).openStream();
+
+						copyFileUsingStream(url2, new File(SOURCE_FOLDER+File.separatorChar+string));
+						
+					} catch (Exception e2) {
+						e2.printStackTrace();
+						
+						
+						
+					}finally {
+						try {
+							url2.close();
+						} catch (IOException e2){
+							e2.printStackTrace();
+						}
+					}
+			}
+			finally {
+				try {
+					url.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		
 		
 	}
