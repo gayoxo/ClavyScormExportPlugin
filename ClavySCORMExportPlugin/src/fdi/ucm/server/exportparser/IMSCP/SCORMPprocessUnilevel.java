@@ -24,13 +24,17 @@ import java.nio.channels.ReadableByteChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,7 +77,7 @@ import fdi.ucm.server.modelComplete.collection.grammar.CompleteTextElementType;
  * @author Joaquin Gayoso-Cabada
  *
  */
-public class SCORMPprocess {
+public class SCORMPprocessUnilevel {
 
 
 	protected static final String EXPORTTEXT = "Export HTML RESULT";
@@ -105,7 +109,7 @@ private Element imssssequencingCollection;
 private String IDQUEST;
 private int counter=0;
 
-	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
+	public SCORMPprocessUnilevel(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
 		
 		DocumentoT=listaDeDocumentos;
@@ -129,11 +133,25 @@ private int counter=0;
 		
 		for (CompleteDocuments docuemntos : Salvar.getEstructuras())
 			if (DocumentoT.isEmpty()||DocumentoT.contains(docuemntos.getClavilenoid()))
-			completeDocuments.addFirst(docuemntos);
+				completeDocuments.addFirst(docuemntos);
 	
-		
+		Collections.sort(completeDocuments, new Comparator<CompleteDocuments>() {
+
+			@Override
+			public int compare(CompleteDocuments o1, CompleteDocuments o2) {
+				return (int) (o1.getClavilenoid()-o2.getClavilenoid());
+			}
+		});
 		
 
+		Collections.reverse(completeDocuments);
+		
+		Stack<CompleteDocuments> Pila = new Stack<CompleteDocuments>();
+		
+		for (CompleteDocuments completeDocuments2 : completeDocuments) {
+			Pila.push(completeDocuments2);
+		}
+		
 		if (completeDocuments.isEmpty())
 			{
 			CL.getLogLines().add("Error, documento no existe");
@@ -238,7 +256,7 @@ private int counter=0;
 	        manifest.appendChild(imssssequencingCollection);
 	        
 	        processMetadata(document);
-	        String Main_S=processOrganization(completeDocuments,document,GramaticasAProcesar);
+	        String Main_S=processOrganization(Pila,document,GramaticasAProcesar);
 	        {
 				Attr Atr = document.createAttribute("default");
 				Atr.setValue(Main_S);
@@ -322,7 +340,7 @@ private int counter=0;
 //			}
 			InputStream url = null;
 			try {
-				url = SCORMPprocess.class.getResourceAsStream("staticfiles/"+string);
+				url = SCORMPprocessUnilevel.class.getResourceAsStream("staticfiles/"+string);
 
 					copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+string));
 					
@@ -375,7 +393,7 @@ private int counter=0;
 //			URL url = this.getClass().getResource("/staticfiles/"+string);
 			InputStream url = null;
 			try {
-				url = SCORMPprocess.class.getResourceAsStream("staticfiles/shared/"+string);
+				url = SCORMPprocessUnilevel.class.getResourceAsStream("staticfiles/shared/"+string);
 				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+"shared"+File.separatorChar+string));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -436,7 +454,7 @@ private int counter=0;
 //			URL url = this.getClass().getResource("/staticfiles/"+string);
 			InputStream url = null;
 			try {
-				url = SCORMPprocess.class.getResourceAsStream("staticfiles/lightbox/"+string);
+				url = SCORMPprocessUnilevel.class.getResourceAsStream("staticfiles/lightbox/"+string);
 				copyFileUsingStream(url, new File(SOURCE_FOLDER+File.separatorChar+"lightbox"+File.separatorChar+string));
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1053,7 +1071,7 @@ private int counter=0;
 	}
 
 	private String processOrganization(
-			LinkedList<CompleteDocuments> completeDocumentsList,
+			Stack<CompleteDocuments> completeDocumentsList,
 			Document document,
 			ArrayList<CompleteGrammar> GramaticasAProcesar) {
 
@@ -1079,31 +1097,11 @@ private int counter=0;
 		Text nodeKeyValue = document.createTextNode(TextoEntrada);
 		Title.appendChild(nodeKeyValue);
 
-		Element ItemList = document.createElement("item");
-		Organization.appendChild(ItemList);
-
-		Element TitleIL = document.createElement("title");
-		ItemList.appendChild(TitleIL);
-
-		Text nodeKeyValueTiL = document.createTextNode("Cases");
-		TitleIL.appendChild(nodeKeyValueTiL);
-
-		{
-			Attr Atr = document.createAttribute("identifier");
-			Atr.setValue("content_wrapper");
-			ItemList.setAttributeNode(Atr);
-		}
-
-		{
-			Attr Atr = document.createAttribute("isvisible");
-			Atr.setValue("false");
-			ItemList.setAttributeNode(Atr);
-		}
 
 //		Gram_doc = new HashMap<CompleteGrammar, HashSet<CompleteDocuments>>();
 
 		while (!completeDocumentsList.isEmpty()) {
-			CompleteDocuments completeDocuments = completeDocumentsList.removeLast();
+			CompleteDocuments completeDocuments = completeDocumentsList.pop();
 
 			
 			
@@ -1152,7 +1150,7 @@ private int counter=0;
 			     
 		    	 
 		    	 Element Item = document.createElement("item"); 
-		    	 ItemList.appendChild(Item);
+		    	 Organization.appendChild(Item);
 			     
 			     {
 				        Attr Atr = document.createAttribute("identifier");
@@ -1205,6 +1203,10 @@ private int counter=0;
 					        
 					        
 					     
+					        HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
+				    		if (List==null)
+				    			List=new HashSet<CompleteDocuments>();   
+					        
 					     for (CompleteDocuments completedocHijo : ListaLinkeados) {
 					    	 
 								if (!Procesados.contains(completedocHijo))
@@ -1227,24 +1229,34 @@ private int counter=0;
 									    	if (IsQuiz(gramarApp.getViews()))
 									    		 {
 									    		
-									    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
-									    		if (List==null)
-									    			List=new HashSet<CompleteDocuments>();
+									    		
 									    		
 									    		List.add(completedocHijo);
 									    		
-									    		RecursosQ.put(completeDocuments, List);
+									    		
 									    		 break;
 									    		 }
 										}
 									
 									
 									if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
-										processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
+										{
+										
+										completeDocumentsList.push(completedocHijo);
+										
+//										processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
+										}
 									
 								}
 							
-					     }		     
+					     }
+					     
+					     if (!List.isEmpty())
+					    	 RecursosQ.put(completeDocuments, List);
+					     
+					     
+					     
+					     
 					     
 			}
 		     
@@ -1253,7 +1265,7 @@ private int counter=0;
 		     }
 		     
 		Element imssssequencing = document.createElement("imsss:sequencing"); 
-   	 ItemList.appendChild(imssssequencing);
+		Organization.appendChild(imssssequencing);
 		     
    	Element imssscontrolMode = document.createElement("imsss:controlMode"); 
    	imssssequencing.appendChild(imssscontrolMode);
@@ -1351,24 +1363,15 @@ private int counter=0;
    	
    	if (Quizz!=null)
    	{
-   	Element ItemT = document.createElement("item");
-	Organization.appendChild(ItemT);
+
 	
-	Attr AtrI = document.createAttribute("identifier");
-	AtrI.setValue("posttest_item");
-	ItemT.setAttributeNode(AtrI);
-	
-	Element PostTestT = document.createElement("title");
-	ItemT.appendChild(PostTestT);
-	
-	Text nodeKeyValueTi = document.createTextNode("Post Test");
-	PostTestT.appendChild(nodeKeyValueTi);
+
 	
 	int i=1;
 	for (Entry<CompleteDocuments, HashSet<CompleteDocuments>> completeGrammar : RecursosQ.entrySet()) {
 		
 		Element ItemTH = document.createElement("item");
-		ItemT.appendChild(ItemTH);
+		Organization.appendChild(ItemTH);
 		
 		{
 			Attr Atr = document.createAttribute("identifier");
@@ -1422,7 +1425,9 @@ private int counter=0;
 	
 	
 	Element imssssequencing2 = document.createElement("imsss:sequencing");
-	ItemT.appendChild(imssssequencing2);
+//	ItemT.appendChild(imssssequencing2);
+	
+	Organization.appendChild(imssssequencing2);
 	
 	Element imssscontrolMode2 = document.createElement("imsss:controlMode");
 	imssssequencing2.appendChild(imssscontrolMode2);
@@ -1965,123 +1970,123 @@ private int counter=0;
 
 
 
-
-	private void processItem(Element item, CompleteDocuments completeDocuments,
-			ArrayList<CompleteGrammar> GramaticasAplicadas, Document document, HashSet<CompleteDocuments> procesados) {
-		
-	    	 
-	    	 HashSet<CompleteDocuments> ListaLinkeados=new HashSet<CompleteDocuments>();
-	    	 HashSet<CompleteDocuments> Procesados=new HashSet<CompleteDocuments>(procesados);
-	    	 
-	    	 
-	    	 
-	    	 
-//	    	 for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
+//
+//	private void processItem(Element item, CompleteDocuments completeDocuments,
+//			ArrayList<CompleteGrammar> GramaticasAplicadas, Document document, HashSet<CompleteDocuments> procesados) {
+//		
 //	    	 
-//	    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
+//	    	 HashSet<CompleteDocuments> ListaLinkeados=new HashSet<CompleteDocuments>();
+//	    	 HashSet<CompleteDocuments> Procesados=new HashSet<CompleteDocuments>(procesados);
 //	    	 
-//	    	 if (DocGram==null)
-//	    		 DocGram=new HashSet<CompleteDocuments>();
 //	    	 
-//	    	 DocGram.add(completeDocuments);
 //	    	 
-//	    	 Gram_doc.put(completeGrammar, DocGram);
 //	    	 
-//	    	 }
-	    	 
-	    	 String Grammarname="ungrammar";
-	    	 if (GramaticasAplicadas.size()>0)
-	    		 Grammarname=GramaticasAplicadas.get(0).getNombre();
-	    	 
-	    	 
-	    	 
-	    	 Element Item = document.createElement("item"); 
-	    	 item.appendChild(Item);
-		     
-		     {
-			        Attr Atr = document.createAttribute("identifier");
-			        Atr.setValue(Grammarname +": " +completeDocuments.getClavilenoid()+"_"+contador_IDs++);
-			        Item.setAttributeNode(Atr);
-			        }
-			        
-			        {
-			      
-			        String MAINSTR="MAIN_RESOURCE"+(contadorRec++);	
-			        String Recurso=ProcessFileHTML(completeDocuments,GramaticasAplicadas,ListaLinkeados);
-				    Attr Atr = document.createAttribute("identifierref");
-				    Atr.setValue(MAINSTR);
-				    Item.setAttributeNode(Atr);
-				    Recursos.put(MAINSTR, Recurso);
-				    RecursosP.put(MAINSTR,completeDocuments);
-				    
-				    
-//				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
-//				    	if (IsQuiz(gramarApp.getViews()))
-//				    		 {
-//				    		RecursosQ.put(completeDocuments, Recurso);
-//				    		 break;
-//				    		 }
-//					}
-				    
-				    }
-			        
-			        Element TitleI = document.createElement("title"); 
-			        Item.appendChild(TitleI);
-			        
-			        String CuterTiyle=Grammarname+": "+completeDocuments.getDescriptionText();
-			        if (CuterTiyle.length()>55)
-			        	CuterTiyle=CuterTiyle.substring(0, 50)+"...";
-			        
-				     Text nodeKeyValueTi = document.createTextNode(CuterTiyle);
-				     TitleI.appendChild(nodeKeyValueTi);
-				     
-				     
-				     for (CompleteDocuments completedocHijo : ListaLinkeados) {
-				    	 
-				    	 
-							if (!Procesados.contains(completedocHijo))
-							{
-								Procesados.add(completedocHijo);
-								ArrayList<CompleteGrammar> GramaticasAProcesarHijo=ProcesaGramaticas(Salvar.getMetamodelGrammar());
-								ArrayList<CompleteGrammar> completeGrammarLHijo=new ArrayList<CompleteGrammar>();
-								
-
-								
-								
-								for (CompleteGrammar completeGrammar2 : GramaticasAProcesarHijo) {
-									if (StaticFunctionsSCORM.isInGrammar(completedocHijo,completeGrammar2))
-										completeGrammarLHijo.add(completeGrammar2);
-								
-								
-								}
-								
-								
-//								 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
-//								    	if (IsQuiz(gramarApp.getViews()))
-//								    		 {
-//								    		
-//								    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
-//								    		if (List==null)
-//								    			List=new HashSet<CompleteDocuments>();
-//								    		
-//								    		List.add(completedocHijo);
-//								    		
-//								    		RecursosQ.put(completeDocuments, List);
-//								    		 break;
-//								    		 }
-//									}
-						    	
-								
-								if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
-									 processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
-								
-							}
-						
-				     
-				     
-		}
-		
-	}
+////	    	 for (CompleteGrammar completeGrammar : GramaticasAplicadas) {
+////	    	 
+////	    	 HashSet<CompleteDocuments> DocGram=Gram_doc.get(completeGrammar);
+////	    	 
+////	    	 if (DocGram==null)
+////	    		 DocGram=new HashSet<CompleteDocuments>();
+////	    	 
+////	    	 DocGram.add(completeDocuments);
+////	    	 
+////	    	 Gram_doc.put(completeGrammar, DocGram);
+////	    	 
+////	    	 }
+//	    	 
+//	    	 String Grammarname="ungrammar";
+//	    	 if (GramaticasAplicadas.size()>0)
+//	    		 Grammarname=GramaticasAplicadas.get(0).getNombre();
+//	    	 
+//	    	 
+//	    	 
+//	    	 Element Item = document.createElement("item"); 
+//	    	 item.appendChild(Item);
+//		     
+//		     {
+//			        Attr Atr = document.createAttribute("identifier");
+//			        Atr.setValue(Grammarname +": " +completeDocuments.getClavilenoid()+"_"+contador_IDs++);
+//			        Item.setAttributeNode(Atr);
+//			        }
+//			        
+//			        {
+//			      
+//			        String MAINSTR="MAIN_RESOURCE"+(contadorRec++);	
+//			        String Recurso=ProcessFileHTML(completeDocuments,GramaticasAplicadas,ListaLinkeados);
+//				    Attr Atr = document.createAttribute("identifierref");
+//				    Atr.setValue(MAINSTR);
+//				    Item.setAttributeNode(Atr);
+//				    Recursos.put(MAINSTR, Recurso);
+//				    RecursosP.put(MAINSTR,completeDocuments);
+//				    
+//				    
+////				    for (CompleteGrammar gramarApp : GramaticasAplicadas) {
+////				    	if (IsQuiz(gramarApp.getViews()))
+////				    		 {
+////				    		RecursosQ.put(completeDocuments, Recurso);
+////				    		 break;
+////				    		 }
+////					}
+//				    
+//				    }
+//			        
+//			        Element TitleI = document.createElement("title"); 
+//			        Item.appendChild(TitleI);
+//			        
+//			        String CuterTiyle=Grammarname+": "+completeDocuments.getDescriptionText();
+//			        if (CuterTiyle.length()>55)
+//			        	CuterTiyle=CuterTiyle.substring(0, 50)+"...";
+//			        
+//				     Text nodeKeyValueTi = document.createTextNode(CuterTiyle);
+//				     TitleI.appendChild(nodeKeyValueTi);
+//				     
+//				     
+//				     for (CompleteDocuments completedocHijo : ListaLinkeados) {
+//				    	 
+//				    	 
+//							if (!Procesados.contains(completedocHijo))
+//							{
+//								Procesados.add(completedocHijo);
+//								ArrayList<CompleteGrammar> GramaticasAProcesarHijo=ProcesaGramaticas(Salvar.getMetamodelGrammar());
+//								ArrayList<CompleteGrammar> completeGrammarLHijo=new ArrayList<CompleteGrammar>();
+//								
+//
+//								
+//								
+//								for (CompleteGrammar completeGrammar2 : GramaticasAProcesarHijo) {
+//									if (StaticFunctionsSCORM.isInGrammar(completedocHijo,completeGrammar2))
+//										completeGrammarLHijo.add(completeGrammar2);
+//								
+//								
+//								}
+//								
+//								
+////								 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
+////								    	if (IsQuiz(gramarApp.getViews()))
+////								    		 {
+////								    		
+////								    		HashSet<CompleteDocuments> List = RecursosQ.get(completeDocuments);
+////								    		if (List==null)
+////								    			List=new HashSet<CompleteDocuments>();
+////								    		
+////								    		List.add(completedocHijo);
+////								    		
+////								    		RecursosQ.put(completeDocuments, List);
+////								    		 break;
+////								    		 }
+////									}
+//						    	
+//								
+//								if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
+//									 processItem(Item,completedocHijo,completeGrammarLHijo,document,Procesados);
+//								
+//							}
+//						
+//				     
+//				     
+//		}
+//		
+//	}
 
 	private String ProcessFileHTML(CompleteDocuments completeDocuments,List<CompleteGrammar> completeGrammarL, HashSet<CompleteDocuments> listaLinkeados) {
 		
@@ -3196,7 +3201,7 @@ return null;
 		 
 			 List<Long> List = new ArrayList<>();
 			 
-			 //36297
+			 //36135 
 			 if (args.length>1)
 					 for (int i = 1; i < args.length; i++) {
 						try {
@@ -3208,7 +3213,7 @@ return null;
 
 
 			 
-			SCORMPprocess SP=new SCORMPprocess(List ,object,Folder,new CompleteLogAndUpdates(),"Test");
+			SCORMPprocessUnilevel SP=new SCORMPprocessUnilevel(List ,object,Folder,new CompleteLogAndUpdates(),"Test");
 			SP.preocess();
 			 
 	    }catch (Exception e) {

@@ -160,11 +160,13 @@ for (var i=0; i<includeFiles.length; i++){
             
             var wasCorrect = false;
             var correctAnswer = null;
-            var learnerResponse = -1;
+            var learnerResponse = "vacio";
             
             switch (question.Type){
                 case QUESTION_TYPE_CHOICE:
-
+					
+                	learnerResponse = -1;
+                	
                     for (var answerIndex = 0; answerIndex < question.Answers.length; answerIndex++){
                         
                         if (question.CorrectAnswer == question.Answers[answerIndex]){
@@ -244,6 +246,7 @@ for (var i=0; i<includeFiles.length; i++){
         document.write ("<div id='test'><form id='frmTest' action='#'>");
         
         var inter=0;
+       
         
         for (var i in test.Questions){
             var question = test.Questions[i];
@@ -263,11 +266,14 @@ for (var i=0; i<includeFiles.length; i++){
             switch (question.Type){
                 case QUESTION_TYPE_CHOICE:
                     var ansIndex = 0;
+                    var letra=97;
                     for (var j in question.Answers){
                         var answer = question.Answers[j];
                         document.write("<div ");
                         if (question.CorrectAnswer == answer) {document.write("class='correctAnswer'");} else{document.write("class='answer'");}
-                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_" + ansIndex + "'/>" + answer + "</div>");
+                        var numero=String.fromCharCode(letra);
+                        letra=letra+1;
+                        document.write("><input type='radio' name='question_" + question.Id + "_choices' id='question_" + question.Id + "_" + ansIndex + "'/>" +numero+") "+ answer + "</div>");
                         ansIndex++;
                     }
                 break;
@@ -284,6 +290,9 @@ for (var i=0; i<includeFiles.length; i++){
                 break;
                 
                 case QUESTION_TYPE_NUMERIC:
+                	
+            	
+                	
                     document.write("<div class='correctAnswer'><input type='text' value='' id='question_" + question.Id + "_Text' onchange='CheckNumeric(this)'/> (");
                     document.write(question.CorrectAnswer + ")</div>");
                 break;

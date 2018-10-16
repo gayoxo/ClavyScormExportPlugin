@@ -293,4 +293,18 @@ public class StaticFunctionsSCORM {
 		return false;
 	}
 
+	public static String getDefault() {
+		return CLAVYICONOS+StaticIconos.ICONODEFAULT;
+	}
+
+	public static String calculaIconoStringDefault(CompleteGrammar completeST) {
+		for (CompleteOperationalValueType completeOperationalValueType : completeST.getViews()) 
+			if (completeOperationalValueType.getView().toLowerCase().equals("ICON".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Default".toLowerCase())&&completeOperationalValueType.getDefault().trim().isEmpty())
+					return completeOperationalValueType.getDefault();
+
+				
+		
+		return null;
+	}
+
 }
