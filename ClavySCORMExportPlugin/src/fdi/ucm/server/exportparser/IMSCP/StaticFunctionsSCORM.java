@@ -1,10 +1,13 @@
 package fdi.ucm.server.exportparser.IMSCP;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
 import fdi.ucm.server.modelComplete.collection.document.CompleteDocuments;
 import fdi.ucm.server.modelComplete.collection.document.CompleteElement;
+import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementFile;
+import fdi.ucm.server.modelComplete.collection.document.CompleteResourceElementURL;
 import fdi.ucm.server.modelComplete.collection.document.CompleteTextElement;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteElementType;
 import fdi.ucm.server.modelComplete.collection.grammar.CompleteGrammar;
@@ -306,5 +309,205 @@ public class StaticFunctionsSCORM {
 		
 		return null;
 	}
+	
+	
+	public static List<Long> getOptions(ArrayList<CompleteElementType> elemtq) {
+		CompleteElementType OptionsS=null;
+		for (CompleteElementType completeElementt : elemtq)
+			if (IsOptions(completeElementt.getShows()))
+				{
+				if (completeElementt.getClassOfIterator()!=null)
+					OptionsS=completeElementt.getClassOfIterator();
+				else
+					OptionsS=completeElementt;
+				break;
+				}
+		
+		List<Long> Salida=new ArrayList<>();
+		for (CompleteElementType completeElementType : elemtq)
+			if (completeElementType.getClassOfIterator()==OptionsS||completeElementType==OptionsS)
+				Salida.add(completeElementType.getClavilenoid());
+		
+		
+		return Salida;
+	}
 
+	
+
+	public static int getSolution(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsAnswer(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if ((completeElement instanceof CompleteTextElement)
+						&&completeElement.getHastype().equals(completeElementt))
+						{
+						try {
+							String SolS=  ((CompleteTextElement) completeElement).getValue();
+							Integer Sol=Integer.parseInt(SolS);
+							return Sol;
+						} catch (Exception e) {
+							// TODO: handle exception
+						}
+						}
+				}
+				return -1;
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						int Salida = getSolution(completeElement.getSons(), description);
+						if (Salida>0)
+							return Salida;
+					}
+				}
+		}
+		return -1;
+	}
+
+	public static String getQuestion(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsQuestion(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if ((completeElement instanceof CompleteTextElement)
+						&&completeElement.getHastype().equals(completeElementt))
+						{
+						return  ((CompleteTextElement) completeElement).getValue();
+						}
+				}
+				return "no text";
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						String Salida = getQuestion(completeElement.getSons(), description);
+						if (Salida!=null)
+							return Salida;
+					}
+				}
+		}
+		return "no text";
+	}
+
+	public static boolean IsQuestion(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("question".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
+	
+	public static boolean IsOptions(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("options".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
+	public static boolean IsAnswer(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Answer".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
+	public static String getImage(List<CompleteElementType> elemtq, List<CompleteElement> description) {
+		for (CompleteElementType completeElementt : elemtq) {
+			if (IsImage(completeElementt.getShows()))
+				{
+				for (CompleteElement completeElement : description) {
+					if (completeElement.getHastype().equals(completeElementt))
+						{
+						if (completeElement instanceof CompleteResourceElementURL)
+							return  ((CompleteResourceElementURL) completeElement).getValue();
+						
+						//TODO AQUI REVISAR COMO ESTA PORQUEIGUAL EL PATH ES RARO
+						if (completeElement instanceof CompleteResourceElementFile)
+							return  ((CompleteResourceElementFile) completeElement).getValue().getPath();
+						
+						if (completeElement instanceof CompleteTextElement)
+							return  ((CompleteTextElement) completeElement).getValue();
+						}
+				}
+				return "";
+				}
+			else
+				{
+					for (CompleteElementType completeElement : completeElementt.getSons()) {
+						String Salida = getImage(completeElement.getSons(), description);
+						if (Salida!=null)
+							return Salida;
+					}
+				}
+		}
+		return "";
+	}
+
+	public static boolean IsImage(ArrayList<CompleteOperationalValueType> shows) {
+		for (CompleteOperationalValueType completeOperationalValueType : shows) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("qimage".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
+	
+	
+	public static boolean IsQuiz(ArrayList<CompleteOperationalValueType> views) {
+		for (CompleteOperationalValueType completeOperationalValueType : views) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Quiz".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+
+	public static boolean IsIgnore(ArrayList<CompleteOperationalValueType> views) {
+		for (CompleteOperationalValueType completeOperationalValueType : views) {
+			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("ignore".toLowerCase()))
+				try {
+					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
+					return Salida;
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
+		}
+		return false;
+	}
+	
 }

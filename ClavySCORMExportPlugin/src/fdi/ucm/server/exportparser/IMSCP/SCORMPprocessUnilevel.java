@@ -24,7 +24,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
@@ -522,10 +521,10 @@ private int counter=0;
 			     
 			     for (CompleteDocuments preguntaE : entry2.getValue()) {
 			     
-			     List<Long> ListaOpciones=getOptions(Quizz.getSons());
-			     int solucion=getSolution(Quizz.getSons(),preguntaE.getDescription());
-			     String pregunta=getQuestion(Quizz.getSons(),preguntaE.getDescription());
-			     String Imagen=getImage(Quizz.getSons(),preguntaE.getDescription());
+			     List<Long> ListaOpciones=StaticFunctionsSCORM.getOptions(Quizz.getSons());
+			     int solucion=StaticFunctionsSCORM.getSolution(Quizz.getSons(),preguntaE.getDescription());
+			     String pregunta=StaticFunctionsSCORM.getQuestion(Quizz.getSons(),preguntaE.getDescription());
+			     String Imagen=StaticFunctionsSCORM.getImage(Quizz.getSons(),preguntaE.getDescription());
 			     
 			     pregunta = pregunta.replace("\"", "\\\"");
 
@@ -601,174 +600,9 @@ private int counter=0;
 		
 	}
 
-	private String getImage(List<CompleteElementType> elemtq, List<CompleteElement> description) {
-		for (CompleteElementType completeElementt : elemtq) {
-			if (IsImage(completeElementt.getShows()))
-				{
-				for (CompleteElement completeElement : description) {
-					if (completeElement.getHastype().equals(completeElementt))
-						{
-						if (completeElement instanceof CompleteResourceElementURL)
-							return  ((CompleteResourceElementURL) completeElement).getValue();
-						
-						//TODO AQUI REVISAR COMO ESTA PORQUEIGUAL EL PATH ES RARO
-						if (completeElement instanceof CompleteResourceElementFile)
-							return  ((CompleteResourceElementFile) completeElement).getValue().getPath();
-						
-						if (completeElement instanceof CompleteTextElement)
-							return  ((CompleteTextElement) completeElement).getValue();
-						}
-				}
-				return "";
-				}
-			else
-				{
-					for (CompleteElementType completeElement : completeElementt.getSons()) {
-						String Salida = getImage(completeElement.getSons(), description);
-						if (Salida!=null)
-							return Salida;
-					}
-				}
-		}
-		return "";
-	}
-
-	private boolean IsImage(ArrayList<CompleteOperationalValueType> shows) {
-		for (CompleteOperationalValueType completeOperationalValueType : shows) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("qimage".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
-
-	private List<Long> getOptions(ArrayList<CompleteElementType> elemtq) {
-		CompleteElementType OptionsS=null;
-		for (CompleteElementType completeElementt : elemtq)
-			if (IsOptions(completeElementt.getShows()))
-				{
-				if (completeElementt.getClassOfIterator()!=null)
-					OptionsS=completeElementt.getClassOfIterator();
-				else
-					OptionsS=completeElementt;
-				break;
-				}
-		
-		List<Long> Salida=new ArrayList<>();
-		for (CompleteElementType completeElementType : elemtq)
-			if (completeElementType.getClassOfIterator()==OptionsS||completeElementType==OptionsS)
-				Salida.add(completeElementType.getClavilenoid());
-		
-		
-		return Salida;
-	}
-
 	
 
-	private int getSolution(List<CompleteElementType> elemtq, List<CompleteElement> description) {
-		for (CompleteElementType completeElementt : elemtq) {
-			if (IsAnswer(completeElementt.getShows()))
-				{
-				for (CompleteElement completeElement : description) {
-					if ((completeElement instanceof CompleteTextElement)
-						&&completeElement.getHastype().equals(completeElementt))
-						{
-						try {
-							String SolS=  ((CompleteTextElement) completeElement).getValue();
-							Integer Sol=Integer.parseInt(SolS);
-							return Sol;
-						} catch (Exception e) {
-							// TODO: handle exception
-						}
-						}
-				}
-				return -1;
-				}
-			else
-				{
-					for (CompleteElementType completeElement : completeElementt.getSons()) {
-						int Salida = getSolution(completeElement.getSons(), description);
-						if (Salida>0)
-							return Salida;
-					}
-				}
-		}
-		return -1;
-	}
-
-	private String getQuestion(List<CompleteElementType> elemtq, List<CompleteElement> description) {
-		
-		for (CompleteElementType completeElementt : elemtq) {
-			if (IsQuestion(completeElementt.getShows()))
-				{
-				for (CompleteElement completeElement : description) {
-					if ((completeElement instanceof CompleteTextElement)
-						&&completeElement.getHastype().equals(completeElementt))
-						{
-						return  ((CompleteTextElement) completeElement).getValue();
-						}
-				}
-				return "no text";
-				}
-			else
-				{
-					for (CompleteElementType completeElement : completeElementt.getSons()) {
-						String Salida = getQuestion(completeElement.getSons(), description);
-						if (Salida!=null)
-							return Salida;
-					}
-				}
-		}
-		return "no text";
-	}
-
-	private boolean IsQuestion(ArrayList<CompleteOperationalValueType> shows) {
-		for (CompleteOperationalValueType completeOperationalValueType : shows) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("question".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
 	
-	
-	private boolean IsOptions(ArrayList<CompleteOperationalValueType> shows) {
-		for (CompleteOperationalValueType completeOperationalValueType : shows) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("options".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
-	
-	private boolean IsAnswer(ArrayList<CompleteOperationalValueType> shows) {
-		for (CompleteOperationalValueType completeOperationalValueType : shows) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Answer".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
 
 	private void creaJS() {
 		FileWriter filewriter = null;
@@ -1226,7 +1060,7 @@ private int counter=0;
 									}
 									
 									 for (CompleteGrammar gramarApp : completeGrammarLHijo) {
-									    	if (IsQuiz(gramarApp.getViews()))
+									    	if (StaticFunctionsSCORM.IsQuiz(gramarApp.getViews()))
 									    		 {
 									    		
 									    		
@@ -1239,7 +1073,7 @@ private int counter=0;
 										}
 									
 									
-									if (!completeGrammarLHijo.isEmpty()&&!IsQuiz(completeGrammarLHijo.get(0).getViews()))
+									if (!completeGrammarLHijo.isEmpty()&&!StaticFunctionsSCORM.IsQuiz(completeGrammarLHijo.get(0).getViews()))
 										{
 										
 										completeDocumentsList.push(completedocHijo);
@@ -3083,43 +2917,17 @@ return null;
 			List<CompleteGrammar> metamodelGrammar) {
 		ArrayList<CompleteGrammar> Salida = new ArrayList<CompleteGrammar>();
 		for (CompleteGrammar completeGrammar : metamodelGrammar) {
-			if (!IsIgnore(completeGrammar.getViews()))
+			if (!StaticFunctionsSCORM.IsIgnore(completeGrammar.getViews()))
 				Salida.add(completeGrammar);
 			
-			if (IsQuiz(completeGrammar.getViews()))
+			if (StaticFunctionsSCORM.IsQuiz(completeGrammar.getViews()))
 				Quizz=completeGrammar;
 		}
 		
 		return Salida;
 	}
 	
-	private boolean IsQuiz(ArrayList<CompleteOperationalValueType> views) {
-		for (CompleteOperationalValueType completeOperationalValueType : views) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("Quiz".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
-
-	private boolean IsIgnore(ArrayList<CompleteOperationalValueType> views) {
-		for (CompleteOperationalValueType completeOperationalValueType : views) {
-			if (completeOperationalValueType.getView().toLowerCase().equals("SCORM".toLowerCase())&&completeOperationalValueType.getName().toLowerCase().equals("ignore".toLowerCase()))
-				try {
-					boolean Salida = Boolean.parseBoolean(completeOperationalValueType.getDefault().toLowerCase());
-					return Salida;
-				} catch (Exception e) {
-					// TODO: handle exception
-				}
-				
-		}
-		return false;
-	}
+	
 
 	public static boolean testLink(String baseURLOda2) {
 		if (baseURLOda2==null||baseURLOda2.isEmpty())
