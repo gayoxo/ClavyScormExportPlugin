@@ -107,7 +107,7 @@ private int counter=0;
 
 	public SCORMPprocess(List<Long> listaDeDocumentos, CompleteCollection salvar, String sOURCE_FOLDER, CompleteLogAndUpdates cL, String entradaText) {
 		
-		
+		System.setProperty("https.protocols", "TLSv1,TLSv1.1,TLSv1.2");
 		DocumentoT=listaDeDocumentos;
 		Salvar=salvar;
 		SOURCE_FOLDER=sOURCE_FOLDER;
